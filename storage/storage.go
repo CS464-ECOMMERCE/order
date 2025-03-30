@@ -1,7 +1,6 @@
 package storage
 
 import (
-	"fmt"
 	"log"
 	"order/configs"
 	"sync"
@@ -26,9 +25,7 @@ func Initialize() {
 	once.Do(func() {
 		config := configs.GetEnvConfig()
 
-		// Create PostgreSQL connection string
-		dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-			config.DbHost, config.DbPort, config.DbUser, config.DbPassword, config.DbName)
+		dsn := config.PostgresConnString
 
 		db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 		if err != nil {

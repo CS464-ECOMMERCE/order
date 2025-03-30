@@ -12,6 +12,7 @@ import (
 
 func main() {
 	// Load configuration
+	configs.InitEnv()
 	config := configs.GetEnvConfig()
 
 	// Initialize database
