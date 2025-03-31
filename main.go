@@ -2,38 +2,21 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"order/configs"
-	"order/controllers"
+	"order/grpc"
 	"order/storage"
-
-	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	// Load configuration
+	fmt.Println("Initializing Order Service...")
 	configs.InitEnv()
-	config := configs.GetEnvConfig()
 
 	// Initialize database
-	storage.Initialize()
-	defer func() {
-		if err := storage.GetInstance().Close(); err != nil {
-			log.Printf("Error closing database connection: %v", err)
-		}
-	}()
+	db := storage.GetInstance() // init db
+	defer db.Close()
 
-	// Create router
-	router := gin.Default()
-
-	// Set up controllers
-	orderController := controllers.NewOrderController()
-	orderController.SetupRoutes(router)
-
-	// Start server
-	addr := fmt.Sprintf(":%s", config.OrderPort)
-	log.Printf("Order service starting on %s", addr)
-	if err := router.Run(addr); err != nil {
-		log.Fatalf("Failed to start server: %v", err)
-	}
+	// Start gRPC server
+	fmt.Println("Starting gRPC server...")
+	grpc.ServerInit()
 }

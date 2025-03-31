@@ -1,20 +1,22 @@
 package services
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"order/models"
 	"order/storage"
+	"time"
+
+	"google.golang.org/grpc"
 )
 
-// CartItem represents an item in the cart as stored in Redis
+// CartItem represents an item in the cart as stored in cartClient
 type CartItem struct {
 	Id       uint64 `json:"id"`
 	Quantity uint64 `json:"quantity"`
 }
 
-// Cart represents a user's shopping cart as stored in Redis
+// Cart represents a user's shopping cart as stored in cartClient
 type Cart struct {
 	SessionId string     `json:"session_id"`
 	Items     []CartItem `json:"items"`
@@ -22,29 +24,26 @@ type Cart struct {
 
 // OrderService provides operations for managing orders
 type OrderService struct {
+	productClient *ProductService
+	cartClient    *CartService
 	redis         *RedisClient
-	productClient *ProductClient
 }
 
 // NewOrderService creates a new order service
-func NewOrderService() *OrderService {
+func NewOrderService(productConn, cartConn *grpc.ClientConn) *OrderService {
 	return &OrderService{
+		productClient: NewProductService(productConn),
+		cartClient:    NewCartService(cartConn),
 		redis:         GetRedisClient(),
-		productClient: GetProductClient(),
 	}
 }
 
 // PlaceOrder creates a new order from a user's cart
 func (s *OrderService) PlaceOrder(sessionId string, userId uint64) (*models.Order, error) {
 	// Get the user's cart
-	cartData, err := s.redis.GetCart(sessionId)
+	cart, err := s.cartClient.GetCart(sessionId)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get cart: %w", err)
-	}
-
-	var cart Cart
-	if err := json.Unmarshal(cartData, &cart); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal cart: %w", err)
 	}
 
 	// Validate cart is not empty
@@ -62,7 +61,7 @@ func (s *OrderService) PlaceOrder(sessionId string, userId uint64) (*models.Orde
 	// Validate inventory and calculate total
 	orderItems := make([]models.OrderItem, 0, len(cart.Items))
 
-	// Define a transaction function to be executed with a Redis lock
+	// Define a transaction function to be executed with a cartClient lock
 	processFn := func() error {
 		for _, item := range cart.Items {
 			// Validate inventory
@@ -106,7 +105,7 @@ func (s *OrderService) PlaceOrder(sessionId string, userId uint64) (*models.Orde
 		}
 
 		// Clear the cart
-		if err := s.redis.DeleteCart(sessionId); err != nil {
+		if err := s.cartClient.DeleteCart(sessionId); err != nil {
 			return fmt.Errorf("failed to clear cart: %w", err)
 		}
 
@@ -114,7 +113,7 @@ func (s *OrderService) PlaceOrder(sessionId string, userId uint64) (*models.Orde
 	}
 
 	// Execute the transaction with a distributed lock
-	err = s.redis.ExecuteWithLock(fmt.Sprintf("order:%s", sessionId), s.redis.config.RedisDefaultTTL, processFn)
+	err = s.redis.ExecuteWithLock(fmt.Sprintf("order:%s", sessionId), 10*time.Second, processFn)
 	if err != nil {
 		return nil, err
 	}
@@ -163,7 +162,7 @@ func (s *OrderService) CancelOrder(id uint64) error {
 		return errors.New("cannot cancel a completed order")
 	}
 
-	// Define a transaction function to be executed with a Redis lock
+	// Define a transaction function to be executed with a cartClient lock
 	cancelFn := func() error {
 		// Restore inventory for each product
 		for _, item := range order.OrderItems {
@@ -188,7 +187,7 @@ func (s *OrderService) CancelOrder(id uint64) error {
 	}
 
 	// Execute the transaction with a distributed lock
-	return s.redis.ExecuteWithLock(fmt.Sprintf("cancel_order:%d", id), s.redis.config.RedisDefaultTTL, cancelFn)
+	return s.redis.ExecuteWithLock(fmt.Sprintf("cancel_order:%d", id), 10*time.Second, cancelFn)
 }
 
 // DeleteOrder deletes an order

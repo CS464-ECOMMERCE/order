@@ -3,64 +3,33 @@ package services
 import (
 	"context"
 	"fmt"
-	"order/configs"
+	pb "order/proto"
 	"time"
 
-	pb "order/proto"
-
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
-// ProductClient is a client for the product service
-type ProductClient struct {
-	conn   *grpc.ClientConn
+type ProductService struct {
 	client pb.ProductServiceClient
-	config configs.EnvConfig
 }
 
-var productClient *ProductClient
-
-// GetProductClient returns a singleton instance of the product client
-func GetProductClient() *ProductClient {
-	if productClient == nil {
-		config := configs.GetEnvConfig()
-
-		// Set up gRPC connection
-		addr := fmt.Sprintf("%s:%s", config.ProductServiceHost, config.ProductServicePort)
-		conn, err := grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
-		if err != nil {
-			panic(fmt.Sprintf("Failed to connect to product service: %v", err))
-		}
-
-		productClient = &ProductClient{
-			conn:   conn,
-			client: pb.NewProductServiceClient(conn),
-			config: config,
-		}
+func NewProductService(conn *grpc.ClientConn) *ProductService {
+	return &ProductService{
+		client: pb.NewProductServiceClient(conn),
 	}
-
-	return productClient
-}
-
-// Close closes the gRPC connection
-func (pc *ProductClient) Close() error {
-	if pc.conn != nil {
-		return pc.conn.Close()
-	}
-	return nil
 }
 
 // GetProduct retrieves a product from the product service
-func (pc *ProductClient) GetProduct(id uint64) (*pb.Product, error) {
+func (pc *ProductService) GetProduct(productID uint64) (*pb.Product, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	return pc.client.GetProduct(ctx, &pb.GetProductRequest{Id: id})
+	resp, err := pc.client.GetProduct(ctx, &pb.GetProductRequest{Id: productID})
+	return resp, err
 }
 
 // ValidateInventory checks if there is sufficient inventory for the requested quantity
-func (pc *ProductClient) ValidateInventory(productID, requestedQuantity uint64) (*pb.Product, error) {
+func (pc *ProductService) ValidateInventory(productID, requestedQuantity uint64) (*pb.Product, error) {
 	product, err := pc.GetProduct(productID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get product: %w", err)
@@ -75,7 +44,7 @@ func (pc *ProductClient) ValidateInventory(productID, requestedQuantity uint64) 
 }
 
 // UpdateInventory updates the inventory of a product
-func (pc *ProductClient) UpdateInventory(productID, newQuantity uint64) error {
+func (pc *ProductService) UpdateInventory(productID, newQuantity uint64) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 

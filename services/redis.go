@@ -9,7 +9,7 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
-// RedisClient wraps the Redis client with additional methods for order operations
+// RedisClient wraps the Redis client with additional methods for cart operations
 type RedisClient struct {
 	client *redis.Client
 	ctx    context.Context
@@ -47,28 +47,6 @@ func GetRedisClient() *RedisClient {
 	}
 
 	return redisClient
-}
-
-// Close closes the Redis client connection
-func (r *RedisClient) Close() error {
-	return r.client.Close()
-}
-
-// getCartKey returns the Redis key for a user's cart
-func (r *RedisClient) getCartKey(session_id string) string {
-	return fmt.Sprintf("cart:%s", session_id)
-}
-
-// GetCart retrieves a user's cart from Redis
-func (r *RedisClient) GetCart(session_id string) ([]byte, error) {
-	key := r.getCartKey(session_id)
-	return r.client.Get(r.ctx, key).Bytes()
-}
-
-// DeleteCart deletes a user's cart
-func (r *RedisClient) DeleteCart(session_id string) error {
-	key := r.getCartKey(session_id)
-	return r.client.Del(r.ctx, key).Err()
 }
 
 // ExecuteWithLock executes a function with a distributed lock
