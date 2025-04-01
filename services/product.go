@@ -29,18 +29,20 @@ func (pc *ProductService) GetProduct(productID uint64) (*pb.Product, error) {
 }
 
 // ValidateInventory checks if there is sufficient inventory for the requested quantity
-func (pc *ProductService) ValidateInventory(productID, requestedQuantity uint64) (*pb.Product, error) {
-	product, err := pc.GetProduct(productID)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get product: %w", err)
+func (pc *ProductService) ValidateInventory(productID, requestedQuantity uint64) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	resp, err := pc.client.ValidateProductInventory(ctx, &pb.ValidateProductInventoryRequest{
+		ProductId: productID,
+		Quantity:  requestedQuantity,
+	})
+
+	if !resp.GetValid() || err != nil {
+		return fmt.Errorf("failed to validate inventory: %w", err)
 	}
 
-	if product.Inventory < requestedQuantity {
-		return nil, fmt.Errorf("insufficient inventory for product %d: requested %d, available %d",
-			productID, requestedQuantity, product.Inventory)
-	}
-
-	return product, nil
+	return nil
 }
 
 // UpdateInventory updates the inventory of a product

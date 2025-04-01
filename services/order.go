@@ -65,9 +65,15 @@ func (s *OrderService) PlaceOrder(sessionId string, userId uint64) (*models.Orde
 	processFn := func() error {
 		for _, item := range cart.Items {
 			// Validate inventory
-			product, err := s.productClient.ValidateInventory(item.Id, item.Quantity)
+			err := s.productClient.ValidateInventory(item.Id, item.Quantity)
 			if err != nil {
 				return err
+			}
+
+			// Get product details
+			product, err := s.productClient.GetProduct(item.Id)
+			if err != nil {
+				return fmt.Errorf("failed to get product: %w", err)
 			}
 
 			// Create order item

@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"context"
-	"fmt"
 	"order/models"
 	pb "order/proto"
 	"order/services"
@@ -31,7 +30,6 @@ func NewOrderController(orderService *services.OrderService) *OrderController {
 
 // PlaceOrder implements the PlaceOrder RPC method
 func (s *OrderController) PlaceOrder(ctx context.Context, req *pb.PlaceOrderRequest) (*pb.Order, error) {
-	fmt.Println("PlaceOrder==================")
 	order, err := s.orderService.PlaceOrder(req.SessionId, req.UserId)
 	if err != nil {
 		return nil, err

@@ -273,12 +273,13 @@ var CartService_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	ProductService_ListProducts_FullMethodName        = "/ecommerce.ProductService/ListProducts"
-	ProductService_GetProduct_FullMethodName          = "/ecommerce.ProductService/GetProduct"
-	ProductService_CreateProduct_FullMethodName       = "/ecommerce.ProductService/CreateProduct"
-	ProductService_DeleteProduct_FullMethodName       = "/ecommerce.ProductService/DeleteProduct"
-	ProductService_UpdateProduct_FullMethodName       = "/ecommerce.ProductService/UpdateProduct"
-	ProductService_UpdateProductImages_FullMethodName = "/ecommerce.ProductService/UpdateProductImages"
+	ProductService_ListProducts_FullMethodName             = "/ecommerce.ProductService/ListProducts"
+	ProductService_GetProduct_FullMethodName               = "/ecommerce.ProductService/GetProduct"
+	ProductService_CreateProduct_FullMethodName            = "/ecommerce.ProductService/CreateProduct"
+	ProductService_DeleteProduct_FullMethodName            = "/ecommerce.ProductService/DeleteProduct"
+	ProductService_UpdateProduct_FullMethodName            = "/ecommerce.ProductService/UpdateProduct"
+	ProductService_UpdateProductImages_FullMethodName      = "/ecommerce.ProductService/UpdateProductImages"
+	ProductService_ValidateProductInventory_FullMethodName = "/ecommerce.ProductService/ValidateProductInventory"
 )
 
 // ProductServiceClient is the client API for ProductService service.
@@ -291,6 +292,7 @@ type ProductServiceClient interface {
 	DeleteProduct(ctx context.Context, in *DeleteProductRequest, opts ...grpc.CallOption) (*Empty, error)
 	UpdateProduct(ctx context.Context, in *UpdateProductRequest, opts ...grpc.CallOption) (*Product, error)
 	UpdateProductImages(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[UpdateProductImagesRequest, UpdateProductImagesResponse], error)
+	ValidateProductInventory(ctx context.Context, in *ValidateProductInventoryRequest, opts ...grpc.CallOption) (*ValidateProductInventoryResponse, error)
 }
 
 type productServiceClient struct {
@@ -364,6 +366,16 @@ func (c *productServiceClient) UpdateProductImages(ctx context.Context, opts ...
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type ProductService_UpdateProductImagesClient = grpc.ClientStreamingClient[UpdateProductImagesRequest, UpdateProductImagesResponse]
 
+func (c *productServiceClient) ValidateProductInventory(ctx context.Context, in *ValidateProductInventoryRequest, opts ...grpc.CallOption) (*ValidateProductInventoryResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ValidateProductInventoryResponse)
+	err := c.cc.Invoke(ctx, ProductService_ValidateProductInventory_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ProductServiceServer is the server API for ProductService service.
 // All implementations must embed UnimplementedProductServiceServer
 // for forward compatibility.
@@ -374,6 +386,7 @@ type ProductServiceServer interface {
 	DeleteProduct(context.Context, *DeleteProductRequest) (*Empty, error)
 	UpdateProduct(context.Context, *UpdateProductRequest) (*Product, error)
 	UpdateProductImages(grpc.ClientStreamingServer[UpdateProductImagesRequest, UpdateProductImagesResponse]) error
+	ValidateProductInventory(context.Context, *ValidateProductInventoryRequest) (*ValidateProductInventoryResponse, error)
 	mustEmbedUnimplementedProductServiceServer()
 }
 
@@ -401,6 +414,9 @@ func (UnimplementedProductServiceServer) UpdateProduct(context.Context, *UpdateP
 }
 func (UnimplementedProductServiceServer) UpdateProductImages(grpc.ClientStreamingServer[UpdateProductImagesRequest, UpdateProductImagesResponse]) error {
 	return status.Errorf(codes.Unimplemented, "method UpdateProductImages not implemented")
+}
+func (UnimplementedProductServiceServer) ValidateProductInventory(context.Context, *ValidateProductInventoryRequest) (*ValidateProductInventoryResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ValidateProductInventory not implemented")
 }
 func (UnimplementedProductServiceServer) mustEmbedUnimplementedProductServiceServer() {}
 func (UnimplementedProductServiceServer) testEmbeddedByValue()                        {}
@@ -520,6 +536,24 @@ func _ProductService_UpdateProductImages_Handler(srv interface{}, stream grpc.Se
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type ProductService_UpdateProductImagesServer = grpc.ClientStreamingServer[UpdateProductImagesRequest, UpdateProductImagesResponse]
 
+func _ProductService_ValidateProductInventory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ValidateProductInventoryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProductServiceServer).ValidateProductInventory(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ProductService_ValidateProductInventory_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProductServiceServer).ValidateProductInventory(ctx, req.(*ValidateProductInventoryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ProductService_ServiceDesc is the grpc.ServiceDesc for ProductService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -546,6 +580,10 @@ var ProductService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateProduct",
 			Handler:    _ProductService_UpdateProduct_Handler,
+		},
+		{
+			MethodName: "ValidateProductInventory",
+			Handler:    _ProductService_ValidateProductInventory_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
