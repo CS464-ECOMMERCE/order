@@ -280,6 +280,7 @@ const (
 	ProductService_UpdateProduct_FullMethodName            = "/ecommerce.ProductService/UpdateProduct"
 	ProductService_UpdateProductImages_FullMethodName      = "/ecommerce.ProductService/UpdateProductImages"
 	ProductService_ValidateProductInventory_FullMethodName = "/ecommerce.ProductService/ValidateProductInventory"
+	ProductService_PlaceOrder_FullMethodName               = "/ecommerce.ProductService/PlaceOrder"
 )
 
 // ProductServiceClient is the client API for ProductService service.
@@ -293,6 +294,7 @@ type ProductServiceClient interface {
 	UpdateProduct(ctx context.Context, in *UpdateProductRequest, opts ...grpc.CallOption) (*Product, error)
 	UpdateProductImages(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[UpdateProductImagesRequest, UpdateProductImagesResponse], error)
 	ValidateProductInventory(ctx context.Context, in *ValidateProductInventoryRequest, opts ...grpc.CallOption) (*ValidateProductInventoryResponse, error)
+	PlaceOrder(ctx context.Context, in *PlaceOrderRequest, opts ...grpc.CallOption) (*PlaceOrderResponse, error)
 }
 
 type productServiceClient struct {
@@ -376,6 +378,16 @@ func (c *productServiceClient) ValidateProductInventory(ctx context.Context, in 
 	return out, nil
 }
 
+func (c *productServiceClient) PlaceOrder(ctx context.Context, in *PlaceOrderRequest, opts ...grpc.CallOption) (*PlaceOrderResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PlaceOrderResponse)
+	err := c.cc.Invoke(ctx, ProductService_PlaceOrder_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ProductServiceServer is the server API for ProductService service.
 // All implementations must embed UnimplementedProductServiceServer
 // for forward compatibility.
@@ -387,6 +399,7 @@ type ProductServiceServer interface {
 	UpdateProduct(context.Context, *UpdateProductRequest) (*Product, error)
 	UpdateProductImages(grpc.ClientStreamingServer[UpdateProductImagesRequest, UpdateProductImagesResponse]) error
 	ValidateProductInventory(context.Context, *ValidateProductInventoryRequest) (*ValidateProductInventoryResponse, error)
+	PlaceOrder(context.Context, *PlaceOrderRequest) (*PlaceOrderResponse, error)
 	mustEmbedUnimplementedProductServiceServer()
 }
 
@@ -417,6 +430,9 @@ func (UnimplementedProductServiceServer) UpdateProductImages(grpc.ClientStreamin
 }
 func (UnimplementedProductServiceServer) ValidateProductInventory(context.Context, *ValidateProductInventoryRequest) (*ValidateProductInventoryResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ValidateProductInventory not implemented")
+}
+func (UnimplementedProductServiceServer) PlaceOrder(context.Context, *PlaceOrderRequest) (*PlaceOrderResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PlaceOrder not implemented")
 }
 func (UnimplementedProductServiceServer) mustEmbedUnimplementedProductServiceServer() {}
 func (UnimplementedProductServiceServer) testEmbeddedByValue()                        {}
@@ -554,6 +570,24 @@ func _ProductService_ValidateProductInventory_Handler(srv interface{}, ctx conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ProductService_PlaceOrder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PlaceOrderRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProductServiceServer).PlaceOrder(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ProductService_PlaceOrder_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProductServiceServer).PlaceOrder(ctx, req.(*PlaceOrderRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ProductService_ServiceDesc is the grpc.ServiceDesc for ProductService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -585,6 +619,10 @@ var ProductService_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "ValidateProductInventory",
 			Handler:    _ProductService_ValidateProductInventory_Handler,
 		},
+		{
+			MethodName: "PlaceOrder",
+			Handler:    _ProductService_PlaceOrder_Handler,
+		},
 	},
 	Streams: []grpc.StreamDesc{
 		{
@@ -597,7 +635,6 @@ var ProductService_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	OrderService_PlaceOrder_FullMethodName          = "/ecommerce.OrderService/PlaceOrder"
 	OrderService_GetOrder_FullMethodName            = "/ecommerce.OrderService/GetOrder"
 	OrderService_GetOrdersByUser_FullMethodName     = "/ecommerce.OrderService/GetOrdersByUser"
 	OrderService_GetOrdersByMerchant_FullMethodName = "/ecommerce.OrderService/GetOrdersByMerchant"
@@ -610,7 +647,6 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type OrderServiceClient interface {
-	PlaceOrder(ctx context.Context, in *PlaceOrderRequest, opts ...grpc.CallOption) (*PlaceOrderResponse, error)
 	GetOrder(ctx context.Context, in *GetOrderRequest, opts ...grpc.CallOption) (*Order, error)
 	GetOrdersByUser(ctx context.Context, in *GetOrdersByUserRequest, opts ...grpc.CallOption) (*GetOrdersResponse, error)
 	GetOrdersByMerchant(ctx context.Context, in *GetOrdersByMerchantRequest, opts ...grpc.CallOption) (*GetOrdersResponse, error)
@@ -625,16 +661,6 @@ type orderServiceClient struct {
 
 func NewOrderServiceClient(cc grpc.ClientConnInterface) OrderServiceClient {
 	return &orderServiceClient{cc}
-}
-
-func (c *orderServiceClient) PlaceOrder(ctx context.Context, in *PlaceOrderRequest, opts ...grpc.CallOption) (*PlaceOrderResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(PlaceOrderResponse)
-	err := c.cc.Invoke(ctx, OrderService_PlaceOrder_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
 }
 
 func (c *orderServiceClient) GetOrder(ctx context.Context, in *GetOrderRequest, opts ...grpc.CallOption) (*Order, error) {
@@ -701,7 +727,6 @@ func (c *orderServiceClient) DeleteOrder(ctx context.Context, in *DeleteOrderReq
 // All implementations must embed UnimplementedOrderServiceServer
 // for forward compatibility.
 type OrderServiceServer interface {
-	PlaceOrder(context.Context, *PlaceOrderRequest) (*PlaceOrderResponse, error)
 	GetOrder(context.Context, *GetOrderRequest) (*Order, error)
 	GetOrdersByUser(context.Context, *GetOrdersByUserRequest) (*GetOrdersResponse, error)
 	GetOrdersByMerchant(context.Context, *GetOrdersByMerchantRequest) (*GetOrdersResponse, error)
@@ -718,9 +743,6 @@ type OrderServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedOrderServiceServer struct{}
 
-func (UnimplementedOrderServiceServer) PlaceOrder(context.Context, *PlaceOrderRequest) (*PlaceOrderResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method PlaceOrder not implemented")
-}
 func (UnimplementedOrderServiceServer) GetOrder(context.Context, *GetOrderRequest) (*Order, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetOrder not implemented")
 }
@@ -758,24 +780,6 @@ func RegisterOrderServiceServer(s grpc.ServiceRegistrar, srv OrderServiceServer)
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&OrderService_ServiceDesc, srv)
-}
-
-func _OrderService_PlaceOrder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PlaceOrderRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(OrderServiceServer).PlaceOrder(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: OrderService_PlaceOrder_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OrderServiceServer).PlaceOrder(ctx, req.(*PlaceOrderRequest))
-	}
-	return interceptor(ctx, in, info, handler)
 }
 
 func _OrderService_GetOrder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -893,10 +897,6 @@ var OrderService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "ecommerce.OrderService",
 	HandlerType: (*OrderServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
-		{
-			MethodName: "PlaceOrder",
-			Handler:    _OrderService_PlaceOrder_Handler,
-		},
 		{
 			MethodName: "GetOrder",
 			Handler:    _OrderService_GetOrder_Handler,

@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"google.golang.org/grpc"
-	pb "order/proto"
 )
 
 // CartItem represents an item in the cart as stored in cartClient
@@ -37,110 +36,6 @@ func NewOrderService(productConn, cartConn *grpc.ClientConn) *OrderService {
 		cartClient:    NewCartService(cartConn),
 		redis:         GetRedisClient(),
 	}
-}
-
-// PlaceOrder creates a new order from a user's cart
-func (s *OrderService) PlaceOrder(req *pb.PlaceOrderRequest) (string, error) {
-	// Get the user's cart
-	cart, err := s.cartClient.GetCart(req.SessionId)
-	if err != nil {
-		return "", fmt.Errorf("failed to get cart: %w", err)
-	}
-
-	// Validate cart is not empty
-	if len(cart.Items) == 0 {
-		return "", errors.New("cart is empty")
-	}
-
-	// Create the order
-	order := &models.Order{
-		UserId: req.UserId,
-		Status: "pending",
-		Total:  0, // Will calculate as we process items
-	}
-
-	// Create payment items for stripe
-	paymentItems := make([]PaymentItem, 0, len(cart.Items))
-
-	// Validate inventory and calculate total
-	orderItems := make([]models.OrderItem, 0, len(cart.Items))
-
-	// Define a transaction function to be executed with a cartClient lock
-	processFn := func() error {
-		for _, item := range cart.Items {
-			// Validate inventory
-			err := s.productClient.ValidateInventory(item.Id, item.Quantity)
-			if err != nil {
-				return err
-			}
-
-			// Get product details
-			product, err := s.productClient.GetProduct(item.Id)
-			if err != nil {
-				return fmt.Errorf("failed to get product: %w", err)
-			}
-
-			// Create order item
-			orderItem := models.OrderItem{
-				ProductId: item.Id,
-				Quantity:  item.Quantity,
-				Price:     product.Price,
-			}
-			orderItems = append(orderItems, orderItem)
-
-			// Update total
-			order.Total += product.Price * float32(item.Quantity)
-		}
-
-		// Save order to database
-		order.OrderItems = orderItems
-		savedOrder, err := storage.GetInstance().Order.CreateOrder(order)
-		if err != nil {
-			return fmt.Errorf("failed to save order: %w", err)
-		}
-		*order = *savedOrder
-
-		// Update inventory for each product
-		for _, item := range cart.Items {
-			product, err := s.productClient.GetProduct(item.Id)
-			if err != nil {
-				return fmt.Errorf("failed to get product for inventory update: %w", err)
-			}
-
-			// Calculate new inventory
-			newInventory := product.Inventory - item.Quantity
-			if err := s.productClient.UpdateInventory(item.Id, newInventory); err != nil {
-				return fmt.Errorf("failed to update inventory: %w", err)
-			}
-
-			// Add payment item for stripe
-			paymentItems = append(paymentItems, PaymentItem{
-				StripePriceId: product.StripePriceId,
-				Quantity:      item.Quantity,
-			})
-		}
-
-		// Clear the cart
-		if err := s.cartClient.DeleteCart(req.SessionId); err != nil {
-			return fmt.Errorf("failed to clear cart: %w", err)
-		}
-
-		return nil
-	}
-
-	// Execute the transaction with a distributed lock
-	err = s.redis.ExecuteWithLock(fmt.Sprintf("order:%s", req.SessionId), 10*time.Second, processFn)
-	if err != nil {
-		return "", err
-	}
-
-	// Create checkout
-	sess, err := NewPaymentService().CreateNewPayment(order.Id, req.UserEmail, paymentItems)
-	if err != nil {
-		return "", fmt.Errorf("failed to create payment: %w", err)
-	}
-
-	return sess, nil
 }
 
 // GetOrder retrieves an order by ID
