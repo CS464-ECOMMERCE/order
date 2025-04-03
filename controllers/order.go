@@ -14,13 +14,6 @@ type OrderController struct {
 	orderService *services.OrderService
 }
 
-// // Response represents a standard API response
-// type Response struct {
-// 	Success bool        `json:"success"`
-// 	Message string      `json:"message,omitempty"`
-// 	Data    interface{} `json:"data,omitempty"`
-// }
-
 // NewOrderController creates a new order controller
 func NewOrderController(orderService *services.OrderService) *OrderController {
 	return &OrderController{
@@ -29,12 +22,12 @@ func NewOrderController(orderService *services.OrderService) *OrderController {
 }
 
 // PlaceOrder implements the PlaceOrder RPC method
-func (s *OrderController) PlaceOrder(ctx context.Context, req *pb.PlaceOrderRequest) (*pb.Order, error) {
-	order, err := s.orderService.PlaceOrder(req.SessionId, req.UserId)
+func (s *OrderController) PlaceOrder(ctx context.Context, req *pb.PlaceOrderRequest) (*pb.PlaceOrderResponse, error) {
+	sess, err := s.orderService.PlaceOrder(req)
 	if err != nil {
 		return nil, err
 	}
-	return convertToProtoOrder(order), nil
+	return &pb.PlaceOrderResponse{CheckoutUrl: sess}, nil
 }
 
 // GetOrder implements the GetOrder RPC method

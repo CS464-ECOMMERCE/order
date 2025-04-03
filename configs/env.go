@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/joho/godotenv"
+	"github.com/stripe/stripe-go/v81"
 )
 
 // EnvConfig holds environment configuration
@@ -60,6 +61,8 @@ func InitEnv() {
 		RedisPassword: getEnv("REDIS_PASSWORD", "redis_password"),
 		RedisDB:       getEnvAsInt("REDIS_DB", 0),
 	}
+
+	stripe.Key = getEnv("STRIPE_SECRET_KEY", "some-secret-key")
 
 	fmt.Println("Order service environment variables initialized")
 }

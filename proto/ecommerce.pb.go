@@ -1302,6 +1302,7 @@ type PlaceOrderRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	SessionId     string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
 	UserId        uint64                 `protobuf:"varint,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	UserEmail     string                 `protobuf:"bytes,3,opt,name=user_email,json=userEmail,proto3" json:"user_email,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1350,6 +1351,57 @@ func (x *PlaceOrderRequest) GetUserId() uint64 {
 	return 0
 }
 
+func (x *PlaceOrderRequest) GetUserEmail() string {
+	if x != nil {
+		return x.UserEmail
+	}
+	return ""
+}
+
+type PlaceOrderResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	CheckoutUrl   string                 `protobuf:"bytes,1,opt,name=checkout_url,json=checkoutUrl,proto3" json:"checkout_url,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PlaceOrderResponse) Reset() {
+	*x = PlaceOrderResponse{}
+	mi := &file_ecommerce_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PlaceOrderResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PlaceOrderResponse) ProtoMessage() {}
+
+func (x *PlaceOrderResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_ecommerce_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PlaceOrderResponse.ProtoReflect.Descriptor instead.
+func (*PlaceOrderResponse) Descriptor() ([]byte, []int) {
+	return file_ecommerce_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *PlaceOrderResponse) GetCheckoutUrl() string {
+	if x != nil {
+		return x.CheckoutUrl
+	}
+	return ""
+}
+
 type GetOrderRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -1359,7 +1411,7 @@ type GetOrderRequest struct {
 
 func (x *GetOrderRequest) Reset() {
 	*x = GetOrderRequest{}
-	mi := &file_ecommerce_proto_msgTypes[22]
+	mi := &file_ecommerce_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1371,7 +1423,7 @@ func (x *GetOrderRequest) String() string {
 func (*GetOrderRequest) ProtoMessage() {}
 
 func (x *GetOrderRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_ecommerce_proto_msgTypes[22]
+	mi := &file_ecommerce_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1384,7 +1436,7 @@ func (x *GetOrderRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetOrderRequest.ProtoReflect.Descriptor instead.
 func (*GetOrderRequest) Descriptor() ([]byte, []int) {
-	return file_ecommerce_proto_rawDescGZIP(), []int{22}
+	return file_ecommerce_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *GetOrderRequest) GetId() uint64 {
@@ -1403,7 +1455,7 @@ type GetOrdersByUserRequest struct {
 
 func (x *GetOrdersByUserRequest) Reset() {
 	*x = GetOrdersByUserRequest{}
-	mi := &file_ecommerce_proto_msgTypes[23]
+	mi := &file_ecommerce_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1415,7 +1467,7 @@ func (x *GetOrdersByUserRequest) String() string {
 func (*GetOrdersByUserRequest) ProtoMessage() {}
 
 func (x *GetOrdersByUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_ecommerce_proto_msgTypes[23]
+	mi := &file_ecommerce_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1428,7 +1480,7 @@ func (x *GetOrdersByUserRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetOrdersByUserRequest.ProtoReflect.Descriptor instead.
 func (*GetOrdersByUserRequest) Descriptor() ([]byte, []int) {
-	return file_ecommerce_proto_rawDescGZIP(), []int{23}
+	return file_ecommerce_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *GetOrdersByUserRequest) GetUserId() uint64 {
@@ -1447,7 +1499,7 @@ type GetOrdersByMerchantRequest struct {
 
 func (x *GetOrdersByMerchantRequest) Reset() {
 	*x = GetOrdersByMerchantRequest{}
-	mi := &file_ecommerce_proto_msgTypes[24]
+	mi := &file_ecommerce_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1459,7 +1511,7 @@ func (x *GetOrdersByMerchantRequest) String() string {
 func (*GetOrdersByMerchantRequest) ProtoMessage() {}
 
 func (x *GetOrdersByMerchantRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_ecommerce_proto_msgTypes[24]
+	mi := &file_ecommerce_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1472,7 +1524,7 @@ func (x *GetOrdersByMerchantRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetOrdersByMerchantRequest.ProtoReflect.Descriptor instead.
 func (*GetOrdersByMerchantRequest) Descriptor() ([]byte, []int) {
-	return file_ecommerce_proto_rawDescGZIP(), []int{24}
+	return file_ecommerce_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *GetOrdersByMerchantRequest) GetMerchantId() uint64 {
@@ -1491,7 +1543,7 @@ type GetOrdersResponse struct {
 
 func (x *GetOrdersResponse) Reset() {
 	*x = GetOrdersResponse{}
-	mi := &file_ecommerce_proto_msgTypes[25]
+	mi := &file_ecommerce_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1503,7 +1555,7 @@ func (x *GetOrdersResponse) String() string {
 func (*GetOrdersResponse) ProtoMessage() {}
 
 func (x *GetOrdersResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_ecommerce_proto_msgTypes[25]
+	mi := &file_ecommerce_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1516,7 +1568,7 @@ func (x *GetOrdersResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetOrdersResponse.ProtoReflect.Descriptor instead.
 func (*GetOrdersResponse) Descriptor() ([]byte, []int) {
-	return file_ecommerce_proto_rawDescGZIP(), []int{25}
+	return file_ecommerce_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *GetOrdersResponse) GetOrders() []*Order {
@@ -1536,7 +1588,7 @@ type UpdateOrderStatusRequest struct {
 
 func (x *UpdateOrderStatusRequest) Reset() {
 	*x = UpdateOrderStatusRequest{}
-	mi := &file_ecommerce_proto_msgTypes[26]
+	mi := &file_ecommerce_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1548,7 +1600,7 @@ func (x *UpdateOrderStatusRequest) String() string {
 func (*UpdateOrderStatusRequest) ProtoMessage() {}
 
 func (x *UpdateOrderStatusRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_ecommerce_proto_msgTypes[26]
+	mi := &file_ecommerce_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1561,7 +1613,7 @@ func (x *UpdateOrderStatusRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateOrderStatusRequest.ProtoReflect.Descriptor instead.
 func (*UpdateOrderStatusRequest) Descriptor() ([]byte, []int) {
-	return file_ecommerce_proto_rawDescGZIP(), []int{26}
+	return file_ecommerce_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *UpdateOrderStatusRequest) GetId() uint64 {
@@ -1587,7 +1639,7 @@ type CancelOrderRequest struct {
 
 func (x *CancelOrderRequest) Reset() {
 	*x = CancelOrderRequest{}
-	mi := &file_ecommerce_proto_msgTypes[27]
+	mi := &file_ecommerce_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1599,7 +1651,7 @@ func (x *CancelOrderRequest) String() string {
 func (*CancelOrderRequest) ProtoMessage() {}
 
 func (x *CancelOrderRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_ecommerce_proto_msgTypes[27]
+	mi := &file_ecommerce_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1612,7 +1664,7 @@ func (x *CancelOrderRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CancelOrderRequest.ProtoReflect.Descriptor instead.
 func (*CancelOrderRequest) Descriptor() ([]byte, []int) {
-	return file_ecommerce_proto_rawDescGZIP(), []int{27}
+	return file_ecommerce_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *CancelOrderRequest) GetId() uint64 {
@@ -1631,7 +1683,7 @@ type DeleteOrderRequest struct {
 
 func (x *DeleteOrderRequest) Reset() {
 	*x = DeleteOrderRequest{}
-	mi := &file_ecommerce_proto_msgTypes[28]
+	mi := &file_ecommerce_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1643,7 +1695,7 @@ func (x *DeleteOrderRequest) String() string {
 func (*DeleteOrderRequest) ProtoMessage() {}
 
 func (x *DeleteOrderRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_ecommerce_proto_msgTypes[28]
+	mi := &file_ecommerce_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1656,7 +1708,7 @@ func (x *DeleteOrderRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteOrderRequest.ProtoReflect.Descriptor instead.
 func (*DeleteOrderRequest) Descriptor() ([]byte, []int) {
-	return file_ecommerce_proto_rawDescGZIP(), []int{28}
+	return file_ecommerce_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *DeleteOrderRequest) GetId() uint64 {
@@ -1775,11 +1827,15 @@ const file_ecommerce_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\x06 \x01(\tR\tcreatedAt\x12\x1d\n" +
 	"\n" +
-	"updated_at\x18\a \x01(\tR\tupdatedAt\"K\n" +
+	"updated_at\x18\a \x01(\tR\tupdatedAt\"j\n" +
 	"\x11PlaceOrderRequest\x12\x1d\n" +
 	"\n" +
 	"session_id\x18\x01 \x01(\tR\tsessionId\x12\x17\n" +
-	"\auser_id\x18\x02 \x01(\x04R\x06userId\"!\n" +
+	"\auser_id\x18\x02 \x01(\x04R\x06userId\x12\x1d\n" +
+	"\n" +
+	"user_email\x18\x03 \x01(\tR\tuserEmail\"7\n" +
+	"\x12PlaceOrderResponse\x12!\n" +
+	"\fcheckout_url\x18\x01 \x01(\tR\vcheckoutUrl\"!\n" +
 	"\x0fGetOrderRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x04R\x02id\"1\n" +
 	"\x16GetOrdersByUserRequest\x12\x17\n" +
@@ -1811,10 +1867,10 @@ const file_ecommerce_proto_rawDesc = "" +
 	"\rDeleteProduct\x12\x1f.ecommerce.DeleteProductRequest\x1a\x10.ecommerce.Empty\"\x00\x12F\n" +
 	"\rUpdateProduct\x12\x1f.ecommerce.UpdateProductRequest\x1a\x12.ecommerce.Product\"\x00\x12h\n" +
 	"\x13UpdateProductImages\x12%.ecommerce.UpdateProductImagesRequest\x1a&.ecommerce.UpdateProductImagesResponse\"\x00(\x01\x12u\n" +
-	"\x18ValidateProductInventory\x12*.ecommerce.ValidateProductInventoryRequest\x1a+.ecommerce.ValidateProductInventoryResponse\"\x002\x90\x04\n" +
-	"\fOrderService\x12>\n" +
+	"\x18ValidateProductInventory\x12*.ecommerce.ValidateProductInventoryRequest\x1a+.ecommerce.ValidateProductInventoryResponse\"\x002\x9d\x04\n" +
+	"\fOrderService\x12K\n" +
 	"\n" +
-	"PlaceOrder\x12\x1c.ecommerce.PlaceOrderRequest\x1a\x10.ecommerce.Order\"\x00\x12:\n" +
+	"PlaceOrder\x12\x1c.ecommerce.PlaceOrderRequest\x1a\x1d.ecommerce.PlaceOrderResponse\"\x00\x12:\n" +
 	"\bGetOrder\x12\x1a.ecommerce.GetOrderRequest\x1a\x10.ecommerce.Order\"\x00\x12T\n" +
 	"\x0fGetOrdersByUser\x12!.ecommerce.GetOrdersByUserRequest\x1a\x1c.ecommerce.GetOrdersResponse\"\x00\x12\\\n" +
 	"\x13GetOrdersByMerchant\x12%.ecommerce.GetOrdersByMerchantRequest\x1a\x1c.ecommerce.GetOrdersResponse\"\x00\x12L\n" +
@@ -1834,7 +1890,7 @@ func file_ecommerce_proto_rawDescGZIP() []byte {
 	return file_ecommerce_proto_rawDescData
 }
 
-var file_ecommerce_proto_msgTypes = make([]protoimpl.MessageInfo, 29)
+var file_ecommerce_proto_msgTypes = make([]protoimpl.MessageInfo, 30)
 var file_ecommerce_proto_goTypes = []any{
 	(*CartItem)(nil),                         // 0: ecommerce.CartItem
 	(*AddItemRequest)(nil),                   // 1: ecommerce.AddItemRequest
@@ -1858,13 +1914,14 @@ var file_ecommerce_proto_goTypes = []any{
 	(*OrderItem)(nil),                        // 19: ecommerce.OrderItem
 	(*Order)(nil),                            // 20: ecommerce.Order
 	(*PlaceOrderRequest)(nil),                // 21: ecommerce.PlaceOrderRequest
-	(*GetOrderRequest)(nil),                  // 22: ecommerce.GetOrderRequest
-	(*GetOrdersByUserRequest)(nil),           // 23: ecommerce.GetOrdersByUserRequest
-	(*GetOrdersByMerchantRequest)(nil),       // 24: ecommerce.GetOrdersByMerchantRequest
-	(*GetOrdersResponse)(nil),                // 25: ecommerce.GetOrdersResponse
-	(*UpdateOrderStatusRequest)(nil),         // 26: ecommerce.UpdateOrderStatusRequest
-	(*CancelOrderRequest)(nil),               // 27: ecommerce.CancelOrderRequest
-	(*DeleteOrderRequest)(nil),               // 28: ecommerce.DeleteOrderRequest
+	(*PlaceOrderResponse)(nil),               // 22: ecommerce.PlaceOrderResponse
+	(*GetOrderRequest)(nil),                  // 23: ecommerce.GetOrderRequest
+	(*GetOrdersByUserRequest)(nil),           // 24: ecommerce.GetOrdersByUserRequest
+	(*GetOrdersByMerchantRequest)(nil),       // 25: ecommerce.GetOrdersByMerchantRequest
+	(*GetOrdersResponse)(nil),                // 26: ecommerce.GetOrdersResponse
+	(*UpdateOrderStatusRequest)(nil),         // 27: ecommerce.UpdateOrderStatusRequest
+	(*CancelOrderRequest)(nil),               // 28: ecommerce.CancelOrderRequest
+	(*DeleteOrderRequest)(nil),               // 29: ecommerce.DeleteOrderRequest
 }
 var file_ecommerce_proto_depIdxs = []int32{
 	0,  // 0: ecommerce.AddItemRequest.item:type_name -> ecommerce.CartItem
@@ -1885,12 +1942,12 @@ var file_ecommerce_proto_depIdxs = []int32{
 	9,  // 15: ecommerce.ProductService.UpdateProductImages:input_type -> ecommerce.UpdateProductImagesRequest
 	17, // 16: ecommerce.ProductService.ValidateProductInventory:input_type -> ecommerce.ValidateProductInventoryRequest
 	21, // 17: ecommerce.OrderService.PlaceOrder:input_type -> ecommerce.PlaceOrderRequest
-	22, // 18: ecommerce.OrderService.GetOrder:input_type -> ecommerce.GetOrderRequest
-	23, // 19: ecommerce.OrderService.GetOrdersByUser:input_type -> ecommerce.GetOrdersByUserRequest
-	24, // 20: ecommerce.OrderService.GetOrdersByMerchant:input_type -> ecommerce.GetOrdersByMerchantRequest
-	26, // 21: ecommerce.OrderService.UpdateOrderStatus:input_type -> ecommerce.UpdateOrderStatusRequest
-	27, // 22: ecommerce.OrderService.CancelOrder:input_type -> ecommerce.CancelOrderRequest
-	28, // 23: ecommerce.OrderService.DeleteOrder:input_type -> ecommerce.DeleteOrderRequest
+	23, // 18: ecommerce.OrderService.GetOrder:input_type -> ecommerce.GetOrderRequest
+	24, // 19: ecommerce.OrderService.GetOrdersByUser:input_type -> ecommerce.GetOrdersByUserRequest
+	25, // 20: ecommerce.OrderService.GetOrdersByMerchant:input_type -> ecommerce.GetOrdersByMerchantRequest
+	27, // 21: ecommerce.OrderService.UpdateOrderStatus:input_type -> ecommerce.UpdateOrderStatusRequest
+	28, // 22: ecommerce.OrderService.CancelOrder:input_type -> ecommerce.CancelOrderRequest
+	29, // 23: ecommerce.OrderService.DeleteOrder:input_type -> ecommerce.DeleteOrderRequest
 	7,  // 24: ecommerce.CartService.AddItem:output_type -> ecommerce.Empty
 	4,  // 25: ecommerce.CartService.GetCart:output_type -> ecommerce.Cart
 	7,  // 26: ecommerce.CartService.EmptyCart:output_type -> ecommerce.Empty
@@ -1903,10 +1960,10 @@ var file_ecommerce_proto_depIdxs = []int32{
 	8,  // 33: ecommerce.ProductService.UpdateProduct:output_type -> ecommerce.Product
 	10, // 34: ecommerce.ProductService.UpdateProductImages:output_type -> ecommerce.UpdateProductImagesResponse
 	18, // 35: ecommerce.ProductService.ValidateProductInventory:output_type -> ecommerce.ValidateProductInventoryResponse
-	20, // 36: ecommerce.OrderService.PlaceOrder:output_type -> ecommerce.Order
+	22, // 36: ecommerce.OrderService.PlaceOrder:output_type -> ecommerce.PlaceOrderResponse
 	20, // 37: ecommerce.OrderService.GetOrder:output_type -> ecommerce.Order
-	25, // 38: ecommerce.OrderService.GetOrdersByUser:output_type -> ecommerce.GetOrdersResponse
-	25, // 39: ecommerce.OrderService.GetOrdersByMerchant:output_type -> ecommerce.GetOrdersResponse
+	26, // 38: ecommerce.OrderService.GetOrdersByUser:output_type -> ecommerce.GetOrdersResponse
+	26, // 39: ecommerce.OrderService.GetOrdersByMerchant:output_type -> ecommerce.GetOrdersResponse
 	20, // 40: ecommerce.OrderService.UpdateOrderStatus:output_type -> ecommerce.Order
 	20, // 41: ecommerce.OrderService.CancelOrder:output_type -> ecommerce.Order
 	7,  // 42: ecommerce.OrderService.DeleteOrder:output_type -> ecommerce.Empty
@@ -1928,7 +1985,7 @@ func file_ecommerce_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_ecommerce_proto_rawDesc), len(file_ecommerce_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   29,
+			NumMessages:   30,
 			NumExtensions: 0,
 			NumServices:   3,
 		},

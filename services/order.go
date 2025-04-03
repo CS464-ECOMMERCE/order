@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"google.golang.org/grpc"
+	pb "order/proto"
 )
 
 // CartItem represents an item in the cart as stored in cartClient
@@ -39,24 +40,27 @@ func NewOrderService(productConn, cartConn *grpc.ClientConn) *OrderService {
 }
 
 // PlaceOrder creates a new order from a user's cart
-func (s *OrderService) PlaceOrder(sessionId string, userId uint64) (*models.Order, error) {
+func (s *OrderService) PlaceOrder(req *pb.PlaceOrderRequest) (string, error) {
 	// Get the user's cart
-	cart, err := s.cartClient.GetCart(sessionId)
+	cart, err := s.cartClient.GetCart(req.SessionId)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get cart: %w", err)
+		return "", fmt.Errorf("failed to get cart: %w", err)
 	}
 
 	// Validate cart is not empty
 	if len(cart.Items) == 0 {
-		return nil, errors.New("cart is empty")
+		return "", errors.New("cart is empty")
 	}
 
 	// Create the order
 	order := &models.Order{
-		UserId: userId,
+		UserId: req.UserId,
 		Status: "pending",
 		Total:  0, // Will calculate as we process items
 	}
+
+	// Create payment items for stripe
+	paymentItems := make([]PaymentItem, 0, len(cart.Items))
 
 	// Validate inventory and calculate total
 	orderItems := make([]models.OrderItem, 0, len(cart.Items))
@@ -108,10 +112,16 @@ func (s *OrderService) PlaceOrder(sessionId string, userId uint64) (*models.Orde
 			if err := s.productClient.UpdateInventory(item.Id, newInventory); err != nil {
 				return fmt.Errorf("failed to update inventory: %w", err)
 			}
+
+			// Add payment item for stripe
+			paymentItems = append(paymentItems, PaymentItem{
+				StripePriceId: product.StripePriceId,
+				Quantity:      item.Quantity,
+			})
 		}
 
 		// Clear the cart
-		if err := s.cartClient.DeleteCart(sessionId); err != nil {
+		if err := s.cartClient.DeleteCart(req.SessionId); err != nil {
 			return fmt.Errorf("failed to clear cart: %w", err)
 		}
 
@@ -119,12 +129,18 @@ func (s *OrderService) PlaceOrder(sessionId string, userId uint64) (*models.Orde
 	}
 
 	// Execute the transaction with a distributed lock
-	err = s.redis.ExecuteWithLock(fmt.Sprintf("order:%s", sessionId), 10*time.Second, processFn)
+	err = s.redis.ExecuteWithLock(fmt.Sprintf("order:%s", req.SessionId), 10*time.Second, processFn)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	return order, nil
+	// Create checkout
+	sess, err := NewPaymentService().CreateNewPayment(order.Id, req.UserEmail, paymentItems)
+	if err != nil {
+		return "", fmt.Errorf("failed to create payment: %w", err)
+	}
+
+	return sess, nil
 }
 
 // GetOrder retrieves an order by ID
