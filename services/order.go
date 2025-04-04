@@ -138,6 +138,10 @@ func (s *OrderService) UpdatePaymentStatus(stripeEvent string, orderId uint64) e
 		err = storage.GetInstance().Order.UpdatePaymentStatus(orderId, models.PaymentStatusCompleted, tx)
 	case string(stripe.EventTypeCheckoutSessionExpired):
 		err = s.handleRevertOrderItems(orderId, tx)
+		if err != nil {
+			break
+		}
+		err = storage.GetInstance().Order.UpdatePaymentStatus(orderId, models.PaymentStatusCancelled, tx)
 	default:
 		err = nil
 	}
