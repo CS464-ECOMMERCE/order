@@ -1411,18 +1411,19 @@ func (x *OrderItem) GetUpdatedAt() string {
 }
 
 type Order struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	UserId        uint64                 `protobuf:"varint,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	Total         float32                `protobuf:"fixed32,3,opt,name=total,proto3" json:"total,omitempty"`
-	Status        OrderStatus            `protobuf:"varint,4,opt,name=status,proto3,enum=ecommerce.OrderStatus" json:"status,omitempty"`
-	TransactionId string                 `protobuf:"bytes,5,opt,name=transaction_id,json=transactionId,proto3" json:"transaction_id,omitempty"`
-	PaymentStatus PaymentStatus          `protobuf:"varint,6,opt,name=payment_status,json=paymentStatus,proto3,enum=ecommerce.PaymentStatus" json:"payment_status,omitempty"`
-	OrderItems    []*OrderItem           `protobuf:"bytes,7,rep,name=order_items,json=orderItems,proto3" json:"order_items,omitempty"`
-	CreatedAt     string                 `protobuf:"bytes,8,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UpdatedAt     string                 `protobuf:"bytes,9,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	Id                uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	UserId            uint64                 `protobuf:"varint,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Total             float32                `protobuf:"fixed32,3,opt,name=total,proto3" json:"total,omitempty"`
+	Status            OrderStatus            `protobuf:"varint,4,opt,name=status,proto3,enum=ecommerce.OrderStatus" json:"status,omitempty"`
+	TransactionId     string                 `protobuf:"bytes,5,opt,name=transaction_id,json=transactionId,proto3" json:"transaction_id,omitempty"`
+	CheckoutSessionId string                 `protobuf:"bytes,6,opt,name=checkout_session_id,json=checkoutSessionId,proto3" json:"checkout_session_id,omitempty"`
+	PaymentStatus     PaymentStatus          `protobuf:"varint,7,opt,name=payment_status,json=paymentStatus,proto3,enum=ecommerce.PaymentStatus" json:"payment_status,omitempty"`
+	OrderItems        []*OrderItem           `protobuf:"bytes,8,rep,name=order_items,json=orderItems,proto3" json:"order_items,omitempty"`
+	CreatedAt         string                 `protobuf:"bytes,9,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt         string                 `protobuf:"bytes,10,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *Order) Reset() {
@@ -1486,6 +1487,13 @@ func (x *Order) GetStatus() OrderStatus {
 func (x *Order) GetTransactionId() string {
 	if x != nil {
 		return x.TransactionId
+	}
+	return ""
+}
+
+func (x *Order) GetCheckoutSessionId() string {
+	if x != nil {
+		return x.CheckoutSessionId
 	}
 	return ""
 }
@@ -1992,20 +2000,22 @@ const file_ecommerce_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\x05 \x01(\tR\tcreatedAt\x12\x1d\n" +
 	"\n" +
-	"updated_at\x18\x06 \x01(\tR\tupdatedAt\"\xd3\x02\n" +
+	"updated_at\x18\x06 \x01(\tR\tupdatedAt\"\x83\x03\n" +
 	"\x05Order\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x04R\x02id\x12\x17\n" +
 	"\auser_id\x18\x02 \x01(\x04R\x06userId\x12\x14\n" +
 	"\x05total\x18\x03 \x01(\x02R\x05total\x12.\n" +
 	"\x06status\x18\x04 \x01(\x0e2\x16.ecommerce.OrderStatusR\x06status\x12%\n" +
-	"\x0etransaction_id\x18\x05 \x01(\tR\rtransactionId\x12?\n" +
-	"\x0epayment_status\x18\x06 \x01(\x0e2\x18.ecommerce.PaymentStatusR\rpaymentStatus\x125\n" +
-	"\vorder_items\x18\a \x03(\v2\x14.ecommerce.OrderItemR\n" +
+	"\x0etransaction_id\x18\x05 \x01(\tR\rtransactionId\x12.\n" +
+	"\x13checkout_session_id\x18\x06 \x01(\tR\x11checkoutSessionId\x12?\n" +
+	"\x0epayment_status\x18\a \x01(\x0e2\x18.ecommerce.PaymentStatusR\rpaymentStatus\x125\n" +
+	"\vorder_items\x18\b \x03(\v2\x14.ecommerce.OrderItemR\n" +
 	"orderItems\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\b \x01(\tR\tcreatedAt\x12\x1d\n" +
+	"created_at\x18\t \x01(\tR\tcreatedAt\x12\x1d\n" +
 	"\n" +
-	"updated_at\x18\t \x01(\tR\tupdatedAt\"!\n" +
+	"updated_at\x18\n" +
+	" \x01(\tR\tupdatedAt\"!\n" +
 	"\x0fGetOrderRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x04R\x02id\"1\n" +
 	"\x16GetOrdersByUserRequest\x12\x17\n" +
