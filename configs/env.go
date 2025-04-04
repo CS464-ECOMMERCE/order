@@ -50,11 +50,11 @@ func InitEnv() {
 		PostgresMaxOpenConns:     getEnvAsInt("POSTGRESQL_MAX_OPEN_CONNS", 10),
 
 		// Service ports
-		GrpcPort: getEnv("ORDER_SERVICE_GRPC_PORT", "50052"),
+		GrpcPort: getEnv("ORDER_SERVICE_GRPC_PORT", "50051"),
 
 		// Product Service
-		ProductServiceAddr: getEnv("PRODUCT_SERVICE_ADDR", "product.default.svc.cluster.local:50050"),
-		CartServiceAddr:    getEnv("CART_SERVICE_ADDR", "cart.default.svc.cluster.local:50050"),
+		ProductServiceAddr: getEnv("PRODUCT_SERVICE_ADDR", "product.default.svc.cluster.local:50051"),
+		CartServiceAddr:    getEnv("CART_SERVICE_ADDR", "cart.default.svc.cluster.local:50051"),
 
 		// Redis
 		RedisAddr:     getEnv("REDIS_ADDR", "redis:6379"),
