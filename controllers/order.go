@@ -101,6 +101,15 @@ func (s *OrderController) DeleteOrder(ctx context.Context, req *pb.DeleteOrderRe
 	return &pb.Empty{}, nil
 }
 
+// UpdatePaymentStatus implements UpdatePaymentStatus RPC method
+func (s *OrderController) UpdatePaymentStatus(ctx context.Context, req *pb.UpdatePaymentStatusRequest) (*pb.Empty, error) {
+	if err := s.orderService.UpdatePaymentStatus(req.Event, req.OrderId); err != nil {
+		return nil, err
+	}
+
+	return &pb.Empty{}, nil
+}
+
 // convertToProtoOrder converts a model order to a protobuf order
 func convertToProtoOrder(order *models.Order) *pb.Order {
 	orderItems := make([]*pb.OrderItem, len(order.OrderItems))

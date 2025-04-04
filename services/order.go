@@ -7,7 +7,9 @@ import (
 	"order/storage"
 	"time"
 
+	"github.com/stripe/stripe-go/v81"
 	"google.golang.org/grpc"
+	"gorm.io/gorm"
 )
 
 // CartItem represents an item in the cart as stored in cartClient
@@ -40,7 +42,7 @@ func NewOrderService(productConn, cartConn *grpc.ClientConn) *OrderService {
 
 // GetOrder retrieves an order by ID
 func (s *OrderService) GetOrder(id uint64) (*models.Order, error) {
-	return storage.GetInstance().Order.GetOrder(id)
+	return storage.GetInstance().Order.GetOrder(id, nil)
 }
 
 // GetOrdersByUser retrieves all orders for a user
@@ -66,7 +68,7 @@ func (s *OrderService) UpdateOrderStatus(id uint64, status string) error {
 // CancelOrder cancels an order and restores inventory
 func (s *OrderService) CancelOrder(id uint64) error {
 	// Get the order
-	order, err := storage.GetInstance().Order.GetOrder(id)
+	order, err := storage.GetInstance().Order.GetOrder(id, nil)
 	if err != nil {
 		return err
 	}
@@ -110,7 +112,7 @@ func (s *OrderService) CancelOrder(id uint64) error {
 // DeleteOrder deletes an order
 func (s *OrderService) DeleteOrder(id uint64) error {
 	// Get the order
-	order, err := storage.GetInstance().Order.GetOrder(id)
+	order, err := storage.GetInstance().Order.GetOrder(id, nil)
 	if err != nil {
 		return err
 	}
@@ -123,4 +125,49 @@ func (s *OrderService) DeleteOrder(id uint64) error {
 	}
 
 	return storage.GetInstance().Order.DeleteOrder(id)
+}
+
+// UpdatePaymentStatus updates an order payment status
+// and, potentially rolling back an unpaid order
+func (s *OrderService) UpdatePaymentStatus(stripeEvent string, orderId uint64) error {
+	tx := storage.GetInstance().BeginTransaction()
+	var err error
+
+	switch stripeEvent {
+	case string(stripe.EventTypeCheckoutSessionCompleted):
+		err = storage.GetInstance().Order.UpdatePaymentStatus(orderId, models.PaymentStatusCompleted, tx)
+	case string(stripe.EventTypeCheckoutSessionExpired):
+		err = s.handleRevertOrderItems(orderId, tx)
+	default:
+		err = nil
+	}
+
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if err = tx.Commit().Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return nil
+}
+
+func (s *OrderService) handleRevertOrderItems(orderId uint64, tx *gorm.DB) error {
+	order, err := storage.GetInstance().Order.GetOrder(orderId, tx)
+
+	if err != nil {
+		return err
+	}
+
+	// Revert all the quantities
+	for _, item := range order.OrderItems {
+		if err = storage.GetInstance().Product.RevertProductQuantity(item.ProductId, item.Quantity, tx); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

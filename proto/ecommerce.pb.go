@@ -1834,6 +1834,58 @@ func (x *DeleteOrderRequest) GetId() uint64 {
 	return 0
 }
 
+type UpdatePaymentStatusRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Event         string                 `protobuf:"bytes,1,opt,name=event,proto3" json:"event,omitempty"`
+	OrderId       uint64                 `protobuf:"varint,2,opt,name=orderId,proto3" json:"orderId,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdatePaymentStatusRequest) Reset() {
+	*x = UpdatePaymentStatusRequest{}
+	mi := &file_ecommerce_proto_msgTypes[30]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdatePaymentStatusRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdatePaymentStatusRequest) ProtoMessage() {}
+
+func (x *UpdatePaymentStatusRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_ecommerce_proto_msgTypes[30]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdatePaymentStatusRequest.ProtoReflect.Descriptor instead.
+func (*UpdatePaymentStatusRequest) Descriptor() ([]byte, []int) {
+	return file_ecommerce_proto_rawDescGZIP(), []int{30}
+}
+
+func (x *UpdatePaymentStatusRequest) GetEvent() string {
+	if x != nil {
+		return x.Event
+	}
+	return ""
+}
+
+func (x *UpdatePaymentStatusRequest) GetOrderId() uint64 {
+	if x != nil {
+		return x.OrderId
+	}
+	return 0
+}
+
 var File_ecommerce_proto protoreflect.FileDescriptor
 
 const file_ecommerce_proto_rawDesc = "" +
@@ -1969,7 +2021,10 @@ const file_ecommerce_proto_rawDesc = "" +
 	"\x12CancelOrderRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x04R\x02id\"$\n" +
 	"\x12DeleteOrderRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x04R\x02id*b\n" +
+	"\x02id\x18\x01 \x01(\x04R\x02id\"L\n" +
+	"\x1aUpdatePaymentStatusRequest\x12\x14\n" +
+	"\x05event\x18\x01 \x01(\tR\x05event\x12\x18\n" +
+	"\aorderId\x18\x02 \x01(\x04R\aorderId*b\n" +
 	"\vOrderStatus\x12\x1b\n" +
 	"\x17ORDER_STATUS_PROCESSING\x10\x00\x12\x1a\n" +
 	"\x16ORDER_STATUS_COMPLETED\x10\x01\x12\x1a\n" +
@@ -1995,14 +2050,15 @@ const file_ecommerce_proto_rawDesc = "" +
 	"\x13UpdateProductImages\x12%.ecommerce.UpdateProductImagesRequest\x1a&.ecommerce.UpdateProductImagesResponse\"\x00(\x01\x12u\n" +
 	"\x18ValidateProductInventory\x12*.ecommerce.ValidateProductInventoryRequest\x1a+.ecommerce.ValidateProductInventoryResponse\"\x00\x12K\n" +
 	"\n" +
-	"PlaceOrder\x12\x1c.ecommerce.PlaceOrderRequest\x1a\x1d.ecommerce.PlaceOrderResponse\"\x002\xd0\x03\n" +
+	"PlaceOrder\x12\x1c.ecommerce.PlaceOrderRequest\x1a\x1d.ecommerce.PlaceOrderResponse\"\x002\xa2\x04\n" +
 	"\fOrderService\x12:\n" +
 	"\bGetOrder\x12\x1a.ecommerce.GetOrderRequest\x1a\x10.ecommerce.Order\"\x00\x12T\n" +
 	"\x0fGetOrdersByUser\x12!.ecommerce.GetOrdersByUserRequest\x1a\x1c.ecommerce.GetOrdersResponse\"\x00\x12\\\n" +
 	"\x13GetOrdersByMerchant\x12%.ecommerce.GetOrdersByMerchantRequest\x1a\x1c.ecommerce.GetOrdersResponse\"\x00\x12L\n" +
 	"\x11UpdateOrderStatus\x12#.ecommerce.UpdateOrderStatusRequest\x1a\x10.ecommerce.Order\"\x00\x12@\n" +
 	"\vCancelOrder\x12\x1d.ecommerce.CancelOrderRequest\x1a\x10.ecommerce.Order\"\x00\x12@\n" +
-	"\vDeleteOrder\x12\x1d.ecommerce.DeleteOrderRequest\x1a\x10.ecommerce.Empty\"\x00B2Z0https://github.com/CS464-ECOMMERCE/ecommerce-appb\x06proto3"
+	"\vDeleteOrder\x12\x1d.ecommerce.DeleteOrderRequest\x1a\x10.ecommerce.Empty\"\x00\x12P\n" +
+	"\x13UpdatePaymentStatus\x12%.ecommerce.UpdatePaymentStatusRequest\x1a\x10.ecommerce.Empty\"\x00B2Z0https://github.com/CS464-ECOMMERCE/ecommerce-appb\x06proto3"
 
 var (
 	file_ecommerce_proto_rawDescOnce sync.Once
@@ -2017,7 +2073,7 @@ func file_ecommerce_proto_rawDescGZIP() []byte {
 }
 
 var file_ecommerce_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_ecommerce_proto_msgTypes = make([]protoimpl.MessageInfo, 30)
+var file_ecommerce_proto_msgTypes = make([]protoimpl.MessageInfo, 31)
 var file_ecommerce_proto_goTypes = []any{
 	(OrderStatus)(0),                         // 0: ecommerce.OrderStatus
 	(PaymentStatus)(0),                       // 1: ecommerce.PaymentStatus
@@ -2051,6 +2107,7 @@ var file_ecommerce_proto_goTypes = []any{
 	(*UpdateOrderStatusRequest)(nil),         // 29: ecommerce.UpdateOrderStatusRequest
 	(*CancelOrderRequest)(nil),               // 30: ecommerce.CancelOrderRequest
 	(*DeleteOrderRequest)(nil),               // 31: ecommerce.DeleteOrderRequest
+	(*UpdatePaymentStatusRequest)(nil),       // 32: ecommerce.UpdatePaymentStatusRequest
 }
 var file_ecommerce_proto_depIdxs = []int32{
 	2,  // 0: ecommerce.AddItemRequest.item:type_name -> ecommerce.CartItem
@@ -2079,27 +2136,29 @@ var file_ecommerce_proto_depIdxs = []int32{
 	29, // 23: ecommerce.OrderService.UpdateOrderStatus:input_type -> ecommerce.UpdateOrderStatusRequest
 	30, // 24: ecommerce.OrderService.CancelOrder:input_type -> ecommerce.CancelOrderRequest
 	31, // 25: ecommerce.OrderService.DeleteOrder:input_type -> ecommerce.DeleteOrderRequest
-	9,  // 26: ecommerce.CartService.AddItem:output_type -> ecommerce.Empty
-	6,  // 27: ecommerce.CartService.GetCart:output_type -> ecommerce.Cart
-	9,  // 28: ecommerce.CartService.EmptyCart:output_type -> ecommerce.Empty
-	9,  // 29: ecommerce.CartService.RemoveItem:output_type -> ecommerce.Empty
-	9,  // 30: ecommerce.CartService.UpdateItemQuantity:output_type -> ecommerce.Empty
-	16, // 31: ecommerce.ProductService.ListProducts:output_type -> ecommerce.ListProductsResponse
-	10, // 32: ecommerce.ProductService.GetProduct:output_type -> ecommerce.Product
-	10, // 33: ecommerce.ProductService.CreateProduct:output_type -> ecommerce.Product
-	9,  // 34: ecommerce.ProductService.DeleteProduct:output_type -> ecommerce.Empty
-	10, // 35: ecommerce.ProductService.UpdateProduct:output_type -> ecommerce.Product
-	12, // 36: ecommerce.ProductService.UpdateProductImages:output_type -> ecommerce.UpdateProductImagesResponse
-	20, // 37: ecommerce.ProductService.ValidateProductInventory:output_type -> ecommerce.ValidateProductInventoryResponse
-	22, // 38: ecommerce.ProductService.PlaceOrder:output_type -> ecommerce.PlaceOrderResponse
-	24, // 39: ecommerce.OrderService.GetOrder:output_type -> ecommerce.Order
-	28, // 40: ecommerce.OrderService.GetOrdersByUser:output_type -> ecommerce.GetOrdersResponse
-	28, // 41: ecommerce.OrderService.GetOrdersByMerchant:output_type -> ecommerce.GetOrdersResponse
-	24, // 42: ecommerce.OrderService.UpdateOrderStatus:output_type -> ecommerce.Order
-	24, // 43: ecommerce.OrderService.CancelOrder:output_type -> ecommerce.Order
-	9,  // 44: ecommerce.OrderService.DeleteOrder:output_type -> ecommerce.Empty
-	26, // [26:45] is the sub-list for method output_type
-	7,  // [7:26] is the sub-list for method input_type
+	32, // 26: ecommerce.OrderService.UpdatePaymentStatus:input_type -> ecommerce.UpdatePaymentStatusRequest
+	9,  // 27: ecommerce.CartService.AddItem:output_type -> ecommerce.Empty
+	6,  // 28: ecommerce.CartService.GetCart:output_type -> ecommerce.Cart
+	9,  // 29: ecommerce.CartService.EmptyCart:output_type -> ecommerce.Empty
+	9,  // 30: ecommerce.CartService.RemoveItem:output_type -> ecommerce.Empty
+	9,  // 31: ecommerce.CartService.UpdateItemQuantity:output_type -> ecommerce.Empty
+	16, // 32: ecommerce.ProductService.ListProducts:output_type -> ecommerce.ListProductsResponse
+	10, // 33: ecommerce.ProductService.GetProduct:output_type -> ecommerce.Product
+	10, // 34: ecommerce.ProductService.CreateProduct:output_type -> ecommerce.Product
+	9,  // 35: ecommerce.ProductService.DeleteProduct:output_type -> ecommerce.Empty
+	10, // 36: ecommerce.ProductService.UpdateProduct:output_type -> ecommerce.Product
+	12, // 37: ecommerce.ProductService.UpdateProductImages:output_type -> ecommerce.UpdateProductImagesResponse
+	20, // 38: ecommerce.ProductService.ValidateProductInventory:output_type -> ecommerce.ValidateProductInventoryResponse
+	22, // 39: ecommerce.ProductService.PlaceOrder:output_type -> ecommerce.PlaceOrderResponse
+	24, // 40: ecommerce.OrderService.GetOrder:output_type -> ecommerce.Order
+	28, // 41: ecommerce.OrderService.GetOrdersByUser:output_type -> ecommerce.GetOrdersResponse
+	28, // 42: ecommerce.OrderService.GetOrdersByMerchant:output_type -> ecommerce.GetOrdersResponse
+	24, // 43: ecommerce.OrderService.UpdateOrderStatus:output_type -> ecommerce.Order
+	24, // 44: ecommerce.OrderService.CancelOrder:output_type -> ecommerce.Order
+	9,  // 45: ecommerce.OrderService.DeleteOrder:output_type -> ecommerce.Empty
+	9,  // 46: ecommerce.OrderService.UpdatePaymentStatus:output_type -> ecommerce.Empty
+	27, // [27:47] is the sub-list for method output_type
+	7,  // [7:27] is the sub-list for method input_type
 	7,  // [7:7] is the sub-list for extension type_name
 	7,  // [7:7] is the sub-list for extension extendee
 	0,  // [0:7] is the sub-list for field type_name
@@ -2116,7 +2175,7 @@ func file_ecommerce_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_ecommerce_proto_rawDesc), len(file_ecommerce_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   30,
+			NumMessages:   31,
 			NumExtensions: 0,
 			NumServices:   3,
 		},

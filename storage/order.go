@@ -10,11 +10,12 @@ import (
 // OrderInterface defines the operations for order storage
 type OrderInterface interface {
 	CreateOrder(order *models.Order) (*models.Order, error)
-	GetOrder(id uint64) (*models.Order, error)
+	GetOrder(id uint64, tx *gorm.DB) (*models.Order, error)
 	GetOrdersByUserId(userId uint64) ([]*models.Order, error)
 	GetOrdersByMerchantId(merchantId uint64) ([]*models.Order, error)
 	UpdateOrderStatus(id uint64, status string) error
 	DeleteOrder(id uint64) error
+	UpdatePaymentStatus(id uint64, status models.PaymentStatus, tx *gorm.DB) error
 }
 
 // OrderDB implements OrderInterface
@@ -36,8 +37,8 @@ func NewOrderTable(read, write *gorm.DB) OrderInterface {
 }
 
 // CreateOrder creates a new order
-func (db *OrderDB) CreateOrder(order *models.Order) (*models.Order, error) {
-	tx := db.write.Begin()
+func (o *OrderDB) CreateOrder(order *models.Order) (*models.Order, error) {
+	tx := o.write.Begin()
 	defer func() {
 		if r := recover(); r != nil {
 			tx.Rollback()
@@ -63,10 +64,15 @@ func (db *OrderDB) CreateOrder(order *models.Order) (*models.Order, error) {
 }
 
 // GetOrder retrieves an order by ID
-func (db *OrderDB) GetOrder(id uint64) (*models.Order, error) {
+func (o *OrderDB) GetOrder(id uint64, tx *gorm.DB) (*models.Order, error) {
 	var order models.Order
 
-	if err := db.read.Preload("OrderItems").Where("id = ?", id).First(&order).Error; err != nil {
+	db := tx
+	if db == nil {
+		db = o.read
+	}
+
+	if err := tx.Preload("OrderItems").Where("id = ?", id).First(&order).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.New("order not found")
 		}
@@ -77,10 +83,10 @@ func (db *OrderDB) GetOrder(id uint64) (*models.Order, error) {
 }
 
 // GetOrdersByUserId retrieves all orders for a user
-func (db *OrderDB) GetOrdersByUserId(userId uint64) ([]*models.Order, error) {
+func (o *OrderDB) GetOrdersByUserId(userId uint64) ([]*models.Order, error) {
 	var orders []*models.Order
 
-	if err := db.read.Preload("OrderItems").Where("user_id = ?", userId).Find(&orders).Error; err != nil {
+	if err := o.read.Preload("OrderItems").Where("user_id = ?", userId).Find(&orders).Error; err != nil {
 		return nil, err
 	}
 
@@ -88,11 +94,11 @@ func (db *OrderDB) GetOrdersByUserId(userId uint64) ([]*models.Order, error) {
 }
 
 // GetOrdersByMerchantId retrieves all orders for a merchant
-func (db *OrderDB) GetOrdersByMerchantId(merchantId uint64) ([]*models.Order, error) {
+func (o *OrderDB) GetOrdersByMerchantId(merchantId uint64) ([]*models.Order, error) {
 	var orders []*models.Order
 
 	// Join orders with order_items, then with products to filter by merchant_id
-	if err := db.read.
+	if err := o.read.
 		Joins("JOIN order_items ON orders.id = order_items.order_id").
 		Joins("JOIN products ON order_items.product_id = products.id").
 		Where("products.merchant_id = ?", merchantId).
@@ -105,8 +111,8 @@ func (db *OrderDB) GetOrdersByMerchantId(merchantId uint64) ([]*models.Order, er
 }
 
 // UpdateOrderStatus updates the status of an order
-func (db *OrderDB) UpdateOrderStatus(id uint64, status string) error {
-	result := db.write.Model(&models.Order{}).Where("id = ?", id).Update("status", status)
+func (o *OrderDB) UpdateOrderStatus(id uint64, status string) error {
+	result := o.write.Model(&models.Order{}).Where("id = ?", id).Update("status", status)
 
 	if result.Error != nil {
 		return result.Error
@@ -120,8 +126,8 @@ func (db *OrderDB) UpdateOrderStatus(id uint64, status string) error {
 }
 
 // DeleteOrder deletes an order
-func (db *OrderDB) DeleteOrder(id uint64) error {
-	tx := db.write.Begin()
+func (o *OrderDB) DeleteOrder(id uint64) error {
+	tx := o.write.Begin()
 	defer func() {
 		if r := recover(); r != nil {
 			tx.Rollback()
@@ -147,6 +153,26 @@ func (db *OrderDB) DeleteOrder(id uint64) error {
 	// Commit transaction
 	if err := tx.Commit().Error; err != nil {
 		return err
+	}
+
+	return nil
+}
+
+// UpdatePaymentStatus updates the payment status of an order
+func (o *OrderDB) UpdatePaymentStatus(id uint64, status models.PaymentStatus, tx *gorm.DB) error {
+	db := tx
+	if db == nil {
+		db = o.write
+	}
+
+	result := db.Model(&models.Order{}).Where("id = ?", id).Update("payment_status", status)
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return errors.New("order not found")
 	}
 
 	return nil

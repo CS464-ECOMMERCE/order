@@ -14,9 +14,10 @@ import (
 )
 
 type Storage struct {
-	Order OrderInterface
-	write *gorm.DB
-	read  *gorm.DB
+	Order   OrderInterface
+	write   *gorm.DB
+	read    *gorm.DB
+	Product ProductInterface
 }
 
 var (
@@ -68,6 +69,7 @@ func GetInstance() *Storage {
 		StorageInstance = &Storage{}
 		StorageInstance.Initialize()
 		StorageInstance.Order = NewOrderTable(StorageInstance.read, StorageInstance.write)
+		StorageInstance.Product = NewProductTable(StorageInstance.write)
 	})
 	return StorageInstance
 }
@@ -76,6 +78,11 @@ func GetInstance() *Storage {
 func (s *Storage) AutoMigrate(model interface{}) {
 	s.write.AutoMigrate(model)
 	s.read.AutoMigrate(model)
+}
+
+// BeginTransaction starts a transaction
+func (s *Storage) BeginTransaction() *gorm.DB {
+	return s.write.Begin()
 }
 
 // Close closes the database connections
