@@ -124,23 +124,16 @@ func convertToProtoOrder(order *models.Order) *pb.Order {
 		}
 	}
 
-	var status pb.OrderStatus
-	switch order.Status {
-	case "completed":
-		status = pb.OrderStatus_ORDER_STATUS_PROCESSING
-	case "cancelled":
-		status = pb.OrderStatus_ORDER_STATUS_CANCELLED
-	default:
-		status = pb.OrderStatus_ORDER_STATUS_PROCESSING
-	}
-
 	return &pb.Order{
-		Id:         order.Id,
-		UserId:     order.UserId,
-		Total:      order.Total,
-		Status:     status,
-		OrderItems: orderItems,
-		CreatedAt:  order.CreatedAt.Format(time.RFC3339),
-		UpdatedAt:  order.UpdatedAt.Format(time.RFC3339),
+		Id:                order.Id,
+		UserId:            order.UserId,
+		Total:             order.Total,
+		Status:            string(order.Status),
+		TransactionId:     order.TransactionId,
+		CheckoutSessionId: order.CheckoutSessionId,
+		PaymentStatus:     string(order.PaymentStatus),
+		OrderItems:        orderItems,
+		CreatedAt:         order.CreatedAt.Format(time.RFC3339),
+		UpdatedAt:         order.UpdatedAt.Format(time.RFC3339),
 	}
 }

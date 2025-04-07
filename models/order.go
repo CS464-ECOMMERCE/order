@@ -8,9 +8,9 @@ type OrderStatus string
 type PaymentStatus string
 
 var (
-	OrderStatusPending   OrderStatus = "processing"
-	OrderStatusCompleted OrderStatus = "completed"
-	OrderStatusCancelled OrderStatus = "cancelled"
+	OrderStatusProcessing OrderStatus = "processing"
+	OrderStatusCompleted  OrderStatus = "completed"
+	OrderStatusCancelled  OrderStatus = "cancelled"
 
 	PaymentStatusPending   PaymentStatus = "pending"
 	PaymentStatusCompleted PaymentStatus = "completed"
