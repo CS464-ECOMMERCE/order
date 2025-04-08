@@ -26,7 +26,7 @@ func (s *OrderService) GetOrder(id uint64) (*pb.Order, error) {
 		return nil, err
 	}
 
-	return convertToProtoOrder(order)
+	return convertToProtoOrder(order), nil
 }
 
 // GetOrdersByUser retrieves all orders for a user
@@ -38,7 +38,7 @@ func (s *OrderService) GetOrdersByUser(userId uint64) ([]*pb.Order, error) {
 
 	protoOrders := make([]*pb.Order, len(order))
 	for i, ord := range order {
-		protoOrders[i], err = convertToProtoOrder(ord)
+		protoOrders[i] = convertToProtoOrder(ord)
 		if err != nil {
 			return nil, err
 		}
@@ -56,7 +56,7 @@ func (s *OrderService) GetOrdersByMerchant(merchantId uint64) ([]*pb.Order, erro
 
 	protoOrders := make([]*pb.Order, len(order))
 	for i, ord := range order {
-		protoOrders[i], err = convertToProtoOrder(ord)
+		protoOrders[i] = convertToProtoOrder(ord)
 		if err != nil {
 			return nil, err
 		}
@@ -156,17 +156,21 @@ func (s *OrderService) handleRevertOrderItems(orderId uint64, tx *gorm.DB) error
 }
 
 // convertToProtoOrder converts a model order to a protobuf order
-func convertToProtoOrder(order *models.Order) (*pb.Order, error) {
+func convertToProtoOrder(order *models.Order) *pb.Order {
 	orderItems := make([]*pb.OrderItem, len(order.OrderItems))
 	for i, item := range order.OrderItems {
 		product, err := storage.GetInstance().Product.GetProduct(item.ProductId, nil)
-		if err != nil {
-			return nil, err
-		}
 
-		productImage := ""
-		if len(product.Images) > 0 {
-			productImage = product.Images[0] // get only 1 image
+		var productImage, productName string
+
+		// Handle error if product not found;
+		// Product can be deleted
+		if err == nil {
+			productName = product.Name
+
+			if len(product.Images) > 0 {
+				productImage = product.Images[0] // get only 1 image
+			}
 		}
 
 		orderItems[i] = &pb.OrderItem{
@@ -174,7 +178,7 @@ func convertToProtoOrder(order *models.Order) (*pb.Order, error) {
 			ProductId:    item.ProductId,
 			Quantity:     item.Quantity,
 			Price:        item.Price,
-			ProductName:  product.Name,
+			ProductName:  productName,
 			ProductImage: productImage,
 			CreatedAt:    item.CreatedAt.Format(time.RFC3339),
 			UpdatedAt:    item.UpdatedAt.Format(time.RFC3339),
@@ -192,5 +196,5 @@ func convertToProtoOrder(order *models.Order) (*pb.Order, error) {
 		OrderItems:        orderItems,
 		CreatedAt:         order.CreatedAt.Format(time.RFC3339),
 		UpdatedAt:         order.UpdatedAt.Format(time.RFC3339),
-	}, nil
+	}
 }
