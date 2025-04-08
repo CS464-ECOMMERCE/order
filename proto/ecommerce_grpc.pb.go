@@ -640,7 +640,6 @@ const (
 	OrderService_GetOrdersByMerchant_FullMethodName = "/ecommerce.OrderService/GetOrdersByMerchant"
 	OrderService_UpdateOrderStatus_FullMethodName   = "/ecommerce.OrderService/UpdateOrderStatus"
 	OrderService_CancelOrder_FullMethodName         = "/ecommerce.OrderService/CancelOrder"
-	OrderService_DeleteOrder_FullMethodName         = "/ecommerce.OrderService/DeleteOrder"
 	OrderService_UpdatePaymentStatus_FullMethodName = "/ecommerce.OrderService/UpdatePaymentStatus"
 )
 
@@ -653,7 +652,6 @@ type OrderServiceClient interface {
 	GetOrdersByMerchant(ctx context.Context, in *GetOrdersByMerchantRequest, opts ...grpc.CallOption) (*GetOrdersResponse, error)
 	UpdateOrderStatus(ctx context.Context, in *UpdateOrderStatusRequest, opts ...grpc.CallOption) (*Order, error)
 	CancelOrder(ctx context.Context, in *CancelOrderRequest, opts ...grpc.CallOption) (*Order, error)
-	DeleteOrder(ctx context.Context, in *DeleteOrderRequest, opts ...grpc.CallOption) (*Empty, error)
 	UpdatePaymentStatus(ctx context.Context, in *UpdatePaymentStatusRequest, opts ...grpc.CallOption) (*Empty, error)
 }
 
@@ -715,16 +713,6 @@ func (c *orderServiceClient) CancelOrder(ctx context.Context, in *CancelOrderReq
 	return out, nil
 }
 
-func (c *orderServiceClient) DeleteOrder(ctx context.Context, in *DeleteOrderRequest, opts ...grpc.CallOption) (*Empty, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Empty)
-	err := c.cc.Invoke(ctx, OrderService_DeleteOrder_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *orderServiceClient) UpdatePaymentStatus(ctx context.Context, in *UpdatePaymentStatusRequest, opts ...grpc.CallOption) (*Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Empty)
@@ -744,7 +732,6 @@ type OrderServiceServer interface {
 	GetOrdersByMerchant(context.Context, *GetOrdersByMerchantRequest) (*GetOrdersResponse, error)
 	UpdateOrderStatus(context.Context, *UpdateOrderStatusRequest) (*Order, error)
 	CancelOrder(context.Context, *CancelOrderRequest) (*Order, error)
-	DeleteOrder(context.Context, *DeleteOrderRequest) (*Empty, error)
 	UpdatePaymentStatus(context.Context, *UpdatePaymentStatusRequest) (*Empty, error)
 	mustEmbedUnimplementedOrderServiceServer()
 }
@@ -770,9 +757,6 @@ func (UnimplementedOrderServiceServer) UpdateOrderStatus(context.Context, *Updat
 }
 func (UnimplementedOrderServiceServer) CancelOrder(context.Context, *CancelOrderRequest) (*Order, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CancelOrder not implemented")
-}
-func (UnimplementedOrderServiceServer) DeleteOrder(context.Context, *DeleteOrderRequest) (*Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DeleteOrder not implemented")
 }
 func (UnimplementedOrderServiceServer) UpdatePaymentStatus(context.Context, *UpdatePaymentStatusRequest) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdatePaymentStatus not implemented")
@@ -888,24 +872,6 @@ func _OrderService_CancelOrder_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
-func _OrderService_DeleteOrder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeleteOrderRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(OrderServiceServer).DeleteOrder(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: OrderService_DeleteOrder_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OrderServiceServer).DeleteOrder(ctx, req.(*DeleteOrderRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _OrderService_UpdatePaymentStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdatePaymentStatusRequest)
 	if err := dec(in); err != nil {
@@ -950,10 +916,6 @@ var OrderService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CancelOrder",
 			Handler:    _OrderService_CancelOrder_Handler,
-		},
-		{
-			MethodName: "DeleteOrder",
-			Handler:    _OrderService_DeleteOrder_Handler,
 		},
 		{
 			MethodName: "UpdatePaymentStatus",

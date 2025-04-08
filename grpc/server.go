@@ -17,8 +17,6 @@ import (
 
 // Init initializes and starts the gRPC server
 func ServerInit() {
-	ClientInit() // Initialize gRPC clients
-
 	config := configs.GetEnvConfig()
 	address := fmt.Sprintf(":%s", config.GrpcPort)
 
@@ -32,7 +30,7 @@ func ServerInit() {
 	grpc_health_v1.RegisterHealthServer(s, healthServer)
 	healthServer.SetServingStatus("OrderService", grpc_health_v1.HealthCheckResponse_SERVING)
 
-	orderService := services.NewOrderService(ApiServerInstance.ProductServiceConn, ApiServerInstance.CartServiceConn)
+	orderService := services.NewOrderService()
 
 	pb.RegisterOrderServiceServer(s, controllers.NewOrderController(orderService))
 

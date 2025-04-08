@@ -92,15 +92,6 @@ func (s *OrderController) CancelOrder(ctx context.Context, req *pb.CancelOrderRe
 	return convertToProtoOrder(order), nil
 }
 
-// DeleteOrder implements the DeleteOrder RPC method
-func (s *OrderController) DeleteOrder(ctx context.Context, req *pb.DeleteOrderRequest) (*pb.Empty, error) {
-	if err := s.orderService.DeleteOrder(req.Id); err != nil {
-		return nil, err
-	}
-
-	return &pb.Empty{}, nil
-}
-
 // UpdatePaymentStatus implements UpdatePaymentStatus RPC method
 func (s *OrderController) UpdatePaymentStatus(ctx context.Context, req *pb.UpdatePaymentStatusRequest) (*pb.Empty, error) {
 	if err := s.orderService.UpdatePaymentStatus(req.Event, req.OrderId); err != nil {
