@@ -72,7 +72,7 @@ func (o *OrderDB) GetOrder(id uint64, tx *gorm.DB) (*models.Order, error) {
 		db = o.read
 	}
 
-	if err := tx.Preload("OrderItems").Where("id = ?", id).First(&order).Error; err != nil {
+	if err := db.Preload("OrderItems").Where("id = ?", id).First(&order).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.New("order not found")
 		}
