@@ -69,7 +69,7 @@ func GetInstance() *Storage {
 		StorageInstance = &Storage{}
 		StorageInstance.Initialize()
 		StorageInstance.Order = NewOrderTable(StorageInstance.read, StorageInstance.write)
-		StorageInstance.Product = NewProductTable(StorageInstance.write)
+		StorageInstance.Product = NewProductTable(StorageInstance.read, StorageInstance.write)
 	})
 	return StorageInstance
 }

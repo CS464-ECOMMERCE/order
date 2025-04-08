@@ -8,15 +8,18 @@ import (
 
 type ProductInterface interface {
 	RevertProductQuantity(id, quantity uint64, tx *gorm.DB) error
+	GetProduct(id uint64, tx *gorm.DB) (*models.Product, error)
 }
 
 type ProductDB struct {
+	read  *gorm.DB
 	write *gorm.DB
 }
 
-func NewProductTable(write *gorm.DB) ProductInterface {
+func NewProductTable(read, write *gorm.DB) ProductInterface {
 	StorageInstance.AutoMigrate(&models.Product{})
 	return &ProductDB{
+		read:  read,
 		write: write,
 	}
 }
@@ -40,4 +43,19 @@ func (p *ProductDB) RevertProductQuantity(id, quantity uint64, tx *gorm.DB) erro
 	}
 
 	return nil
+}
+
+func (p *ProductDB) GetProduct(id uint64, tx *gorm.DB) (*models.Product, error) {
+	Product := &models.Product{}
+	db := tx
+	if db == nil {
+		db = p.write
+	}
+
+	ret := db.Where("id = ?", id).First(&Product)
+	if ret.Error != nil {
+		return nil, ret.Error
+	}
+
+	return Product, nil
 }

@@ -3,7 +3,9 @@ package services
 import (
 	"errors"
 	"order/models"
+	pb "order/proto"
 	"order/storage"
+	"time"
 
 	"github.com/stripe/stripe-go/v81"
 	"gorm.io/gorm"
@@ -18,24 +20,57 @@ func NewOrderService() *OrderService {
 }
 
 // GetOrder retrieves an order by ID
-func (s *OrderService) GetOrder(id uint64) (*models.Order, error) {
-	return storage.GetInstance().Order.GetOrder(id, nil)
+func (s *OrderService) GetOrder(id uint64) (*pb.Order, error) {
+	order, err := storage.GetInstance().Order.GetOrder(id, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return convertToProtoOrder(order)
 }
 
 // GetOrdersByUser retrieves all orders for a user
-func (s *OrderService) GetOrdersByUser(userId uint64) ([]*models.Order, error) {
-	return storage.GetInstance().Order.GetOrdersByUserId(userId)
+func (s *OrderService) GetOrdersByUser(userId uint64) ([]*pb.Order, error) {
+	order, err := storage.GetInstance().Order.GetOrdersByUserId(userId)
+	if err != nil {
+		return nil, err
+	}
+
+	protoOrders := make([]*pb.Order, len(order))
+	for i, ord := range order {
+		protoOrders[i], err = convertToProtoOrder(ord)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return protoOrders, nil
 }
 
 // GetOrdersByMerchant retrieves all orders containing products from a specific merchant
-func (s *OrderService) GetOrdersByMerchant(merchantId uint64) ([]*models.Order, error) {
-	return storage.GetInstance().Order.GetOrdersByMerchantId(merchantId)
+func (s *OrderService) GetOrdersByMerchant(merchantId uint64) ([]*pb.Order, error) {
+	order, err := storage.GetInstance().Order.GetOrdersByMerchantId(merchantId)
+	if err != nil {
+		return nil, err
+	}
+
+	protoOrders := make([]*pb.Order, len(order))
+	for i, ord := range order {
+		protoOrders[i], err = convertToProtoOrder(ord)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return protoOrders, nil
 }
 
 // UpdateOrderStatus updates the status of an order
 func (s *OrderService) UpdateOrderStatus(id uint64, status string) error {
 	// Validate status
-	if status != "pending" && status != "completed" && status != "cancelled" {
+	if status != string(models.OrderStatusProcessing) &&
+		status != string(models.OrderStatusCancelled) &&
+		status != string(models.OrderStatusCompleted) {
 		return errors.New("invalid status")
 	}
 
@@ -52,10 +87,10 @@ func (s *OrderService) CancelOrder(id uint64) error {
 	}
 
 	// Check if order is already cancelled or completed
-	if order.Status == "cancelled" {
+	if order.Status == models.OrderStatusCancelled {
 		return errors.New("order is already cancelled")
 	}
-	if order.Status == "completed" {
+	if order.Status == models.OrderStatusCompleted {
 		return errors.New("cannot cancel a completed order")
 	}
 
@@ -118,4 +153,44 @@ func (s *OrderService) handleRevertOrderItems(orderId uint64, tx *gorm.DB) error
 	}
 
 	return nil
+}
+
+// convertToProtoOrder converts a model order to a protobuf order
+func convertToProtoOrder(order *models.Order) (*pb.Order, error) {
+	orderItems := make([]*pb.OrderItem, len(order.OrderItems))
+	for i, item := range order.OrderItems {
+		product, err := storage.GetInstance().Product.GetProduct(item.ProductId, nil)
+		if err != nil {
+			return nil, err
+		}
+
+		productImage := ""
+		if len(product.Images) > 0 {
+			productImage = product.Images[0] // get only 1 image
+		}
+
+		orderItems[i] = &pb.OrderItem{
+			OrderId:      item.OrderId,
+			ProductId:    item.ProductId,
+			Quantity:     item.Quantity,
+			Price:        item.Price,
+			ProductName:  product.Name,
+			ProductImage: productImage,
+			CreatedAt:    item.CreatedAt.Format(time.RFC3339),
+			UpdatedAt:    item.UpdatedAt.Format(time.RFC3339),
+		}
+	}
+
+	return &pb.Order{
+		Id:                order.Id,
+		UserId:            order.UserId,
+		Total:             order.Total,
+		Status:            string(order.Status),
+		TransactionId:     order.TransactionId,
+		CheckoutSessionId: order.CheckoutSessionId,
+		PaymentStatus:     string(order.PaymentStatus),
+		OrderItems:        orderItems,
+		CreatedAt:         order.CreatedAt.Format(time.RFC3339),
+		UpdatedAt:         order.UpdatedAt.Format(time.RFC3339),
+	}, nil
 }

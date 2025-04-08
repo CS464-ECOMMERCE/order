@@ -1232,8 +1232,10 @@ type OrderItem struct {
 	ProductId     uint64                 `protobuf:"varint,2,opt,name=product_id,json=productId,proto3" json:"product_id,omitempty"`
 	Quantity      uint64                 `protobuf:"varint,3,opt,name=quantity,proto3" json:"quantity,omitempty"`
 	Price         float32                `protobuf:"fixed32,4,opt,name=price,proto3" json:"price,omitempty"`
-	CreatedAt     string                 `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UpdatedAt     string                 `protobuf:"bytes,6,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	ProductName   string                 `protobuf:"bytes,5,opt,name=product_name,json=productName,proto3" json:"product_name,omitempty"`
+	ProductImage  string                 `protobuf:"bytes,6,opt,name=product_image,json=productImage,proto3" json:"product_image,omitempty"`
+	CreatedAt     string                 `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt     string                 `protobuf:"bytes,8,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1294,6 +1296,20 @@ func (x *OrderItem) GetPrice() float32 {
 		return x.Price
 	}
 	return 0
+}
+
+func (x *OrderItem) GetProductName() string {
+	if x != nil {
+		return x.ProductName
+	}
+	return ""
+}
+
+func (x *OrderItem) GetProductImage() string {
+	if x != nil {
+		return x.ProductImage
+	}
+	return ""
 }
 
 func (x *OrderItem) GetCreatedAt() string {
@@ -1846,17 +1862,19 @@ const file_ecommerce_proto_rawDesc = "" +
 	"\n" +
 	"user_email\x18\x03 \x01(\tR\tuserEmail\"7\n" +
 	"\x12PlaceOrderResponse\x12!\n" +
-	"\fcheckout_url\x18\x01 \x01(\tR\vcheckoutUrl\"\xb5\x01\n" +
+	"\fcheckout_url\x18\x01 \x01(\tR\vcheckoutUrl\"\xfd\x01\n" +
 	"\tOrderItem\x12\x19\n" +
 	"\border_id\x18\x01 \x01(\x04R\aorderId\x12\x1d\n" +
 	"\n" +
 	"product_id\x18\x02 \x01(\x04R\tproductId\x12\x1a\n" +
 	"\bquantity\x18\x03 \x01(\x04R\bquantity\x12\x14\n" +
-	"\x05price\x18\x04 \x01(\x02R\x05price\x12\x1d\n" +
+	"\x05price\x18\x04 \x01(\x02R\x05price\x12!\n" +
+	"\fproduct_name\x18\x05 \x01(\tR\vproductName\x12#\n" +
+	"\rproduct_image\x18\x06 \x01(\tR\fproductImage\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\x05 \x01(\tR\tcreatedAt\x12\x1d\n" +
+	"created_at\x18\a \x01(\tR\tcreatedAt\x12\x1d\n" +
 	"\n" +
-	"updated_at\x18\x06 \x01(\tR\tupdatedAt\"\xd1\x02\n" +
+	"updated_at\x18\b \x01(\tR\tupdatedAt\"\xd1\x02\n" +
 	"\x05Order\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x04R\x02id\x12\x17\n" +
 	"\auser_id\x18\x02 \x01(\x04R\x06userId\x12\x14\n" +
