@@ -22,10 +22,10 @@ type Order struct {
 	Id                uint64        `json:"id" gorm:"primaryKey"`
 	UserId            uint64        `json:"user_id"`
 	Total             float32       `json:"total"`
-	Status            OrderStatus   `json:"status" gorm:"default:processing"`
+	Status            OrderStatus   `json:"status" gorm:"gorm:type:order_status;default:processing"`
 	TransactionId     string        `json:"transaction_id"`
 	CheckoutSessionId string        `json:"checkout_session_id"`
-	PaymentStatus     PaymentStatus `json:"payment_status" gorm:"default:pending"`
+	PaymentStatus     PaymentStatus `json:"payment_status" gorm:"type:payment_status;default:pending"`
 	OrderItems        []OrderItem   `json:"order_items" gorm:"foreignKey:OrderId"`
 	CreatedAt         time.Time     `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt         time.Time     `json:"updated_at" gorm:"autoUpdateTime"`
