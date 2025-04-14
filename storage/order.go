@@ -165,7 +165,17 @@ func (o *OrderDB) UpdatePaymentStatus(id uint64, status models.PaymentStatus, tx
 		db = o.write
 	}
 
-	result := db.Model(&models.Order{}).Where("id = ?", id).Update("payment_status", status)
+	var orderStatus models.OrderStatus
+	if status == models.PaymentStatusCompleted {
+		orderStatus = models.OrderStatusProcessing
+	} else {
+		orderStatus = models.OrderStatusCancelled
+	}
+
+	result := db.Model(&models.Order{}).Where("id = ?", id).Updates(&models.Order{
+		PaymentStatus: status,
+		Status:        orderStatus,
+	})
 
 	if result.Error != nil {
 		return result.Error
