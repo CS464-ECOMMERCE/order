@@ -102,7 +102,9 @@ func (o *OrderDB) GetOrdersByMerchantId(merchantId uint64) ([]*models.Order, err
 		Joins("JOIN order_items ON orders.id = order_items.order_id").
 		Joins("JOIN products ON order_items.product_id = products.id").
 		Where("products.merchant_id = ?", merchantId).
+		Group("orders.id").
 		Preload("OrderItems").
+		Order("orders.created_at DESC").
 		Find(&orders).Error; err != nil {
 		return nil, err
 	}
