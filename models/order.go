@@ -27,6 +27,7 @@ type Order struct {
 	CheckoutSessionId string        `json:"checkout_session_id"`
 	PaymentStatus     PaymentStatus `json:"payment_status" gorm:"type:payment_status;default:pending"`
 	OrderItems        []OrderItem   `json:"order_items" gorm:"foreignKey:OrderId"`
+	Address           string        `json:"address"`
 	CreatedAt         time.Time     `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt         time.Time     `json:"updated_at" gorm:"autoUpdateTime"`
 }

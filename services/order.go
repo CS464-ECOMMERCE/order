@@ -194,6 +194,7 @@ func convertToProtoOrder(order *models.Order) *pb.Order {
 		CheckoutSessionId: order.CheckoutSessionId,
 		PaymentStatus:     string(order.PaymentStatus),
 		OrderItems:        orderItems,
+		Address:           order.Address,
 		CreatedAt:         order.CreatedAt.Format(time.RFC3339),
 		UpdatedAt:         order.UpdatedAt.Format(time.RFC3339),
 	}

@@ -1127,6 +1127,8 @@ type PlaceOrderRequest struct {
 	SessionId     string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
 	UserId        uint64                 `protobuf:"varint,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	UserEmail     string                 `protobuf:"bytes,3,opt,name=user_email,json=userEmail,proto3" json:"user_email,omitempty"`
+	Address       string                 `protobuf:"bytes,4,opt,name=address,proto3" json:"address,omitempty"`
+	Country       string                 `protobuf:"bytes,5,opt,name=country,proto3" json:"country,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1178,6 +1180,20 @@ func (x *PlaceOrderRequest) GetUserId() uint64 {
 func (x *PlaceOrderRequest) GetUserEmail() string {
 	if x != nil {
 		return x.UserEmail
+	}
+	return ""
+}
+
+func (x *PlaceOrderRequest) GetAddress() string {
+	if x != nil {
+		return x.Address
+	}
+	return ""
+}
+
+func (x *PlaceOrderRequest) GetCountry() string {
+	if x != nil {
+		return x.Country
 	}
 	return ""
 }
@@ -1336,8 +1352,9 @@ type Order struct {
 	CheckoutSessionId string                 `protobuf:"bytes,6,opt,name=checkout_session_id,json=checkoutSessionId,proto3" json:"checkout_session_id,omitempty"`
 	PaymentStatus     string                 `protobuf:"bytes,7,opt,name=payment_status,json=paymentStatus,proto3" json:"payment_status,omitempty"`
 	OrderItems        []*OrderItem           `protobuf:"bytes,8,rep,name=order_items,json=orderItems,proto3" json:"order_items,omitempty"`
-	CreatedAt         string                 `protobuf:"bytes,9,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UpdatedAt         string                 `protobuf:"bytes,10,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	Address           string                 `protobuf:"bytes,9,opt,name=address,proto3" json:"address,omitempty"`
+	CreatedAt         string                 `protobuf:"bytes,10,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt         string                 `protobuf:"bytes,11,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -1426,6 +1443,13 @@ func (x *Order) GetOrderItems() []*OrderItem {
 		return x.OrderItems
 	}
 	return nil
+}
+
+func (x *Order) GetAddress() string {
+	if x != nil {
+		return x.Address
+	}
+	return ""
 }
 
 func (x *Order) GetCreatedAt() string {
@@ -1854,13 +1878,15 @@ const file_ecommerce_proto_rawDesc = "" +
 	"product_id\x18\x01 \x01(\x04R\tproductId\x12\x1a\n" +
 	"\bquantity\x18\x02 \x01(\x04R\bquantity\"8\n" +
 	" ValidateProductInventoryResponse\x12\x14\n" +
-	"\x05valid\x18\x01 \x01(\bR\x05valid\"j\n" +
+	"\x05valid\x18\x01 \x01(\bR\x05valid\"\x9e\x01\n" +
 	"\x11PlaceOrderRequest\x12\x1d\n" +
 	"\n" +
 	"session_id\x18\x01 \x01(\tR\tsessionId\x12\x17\n" +
 	"\auser_id\x18\x02 \x01(\x04R\x06userId\x12\x1d\n" +
 	"\n" +
-	"user_email\x18\x03 \x01(\tR\tuserEmail\"7\n" +
+	"user_email\x18\x03 \x01(\tR\tuserEmail\x12\x18\n" +
+	"\aaddress\x18\x04 \x01(\tR\aaddress\x12\x18\n" +
+	"\acountry\x18\x05 \x01(\tR\acountry\"7\n" +
 	"\x12PlaceOrderResponse\x12!\n" +
 	"\fcheckout_url\x18\x01 \x01(\tR\vcheckoutUrl\"\xfd\x01\n" +
 	"\tOrderItem\x12\x19\n" +
@@ -1874,7 +1900,7 @@ const file_ecommerce_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\a \x01(\tR\tcreatedAt\x12\x1d\n" +
 	"\n" +
-	"updated_at\x18\b \x01(\tR\tupdatedAt\"\xd1\x02\n" +
+	"updated_at\x18\b \x01(\tR\tupdatedAt\"\xeb\x02\n" +
 	"\x05Order\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x04R\x02id\x12\x17\n" +
 	"\auser_id\x18\x02 \x01(\x04R\x06userId\x12\x14\n" +
@@ -1884,12 +1910,13 @@ const file_ecommerce_proto_rawDesc = "" +
 	"\x13checkout_session_id\x18\x06 \x01(\tR\x11checkoutSessionId\x12%\n" +
 	"\x0epayment_status\x18\a \x01(\tR\rpaymentStatus\x125\n" +
 	"\vorder_items\x18\b \x03(\v2\x14.ecommerce.OrderItemR\n" +
-	"orderItems\x12\x1d\n" +
+	"orderItems\x12\x18\n" +
+	"\aaddress\x18\t \x01(\tR\aaddress\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\t \x01(\tR\tcreatedAt\x12\x1d\n" +
+	"created_at\x18\n" +
+	" \x01(\tR\tcreatedAt\x12\x1d\n" +
 	"\n" +
-	"updated_at\x18\n" +
-	" \x01(\tR\tupdatedAt\"!\n" +
+	"updated_at\x18\v \x01(\tR\tupdatedAt\"!\n" +
 	"\x0fGetOrderRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x04R\x02id\"1\n" +
 	"\x16GetOrdersByUserRequest\x12\x17\n" +
